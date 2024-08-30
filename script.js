@@ -53,3 +53,27 @@ function updateCountdown() {
 
 // Update the countdown every second
 const interval = setInterval(updateCountdown, 1000);
+
+// script.js
+function checkNomination() {
+  // Nomination start and end dates
+  const startDate = new Date("2024-08-26T00:00:00");
+  const endDate = new Date("2024-09-05T23:59:59");
+
+  // Current date
+  const currentDate = new Date();
+
+  // Check if nomination has not started
+  if (currentDate < startDate) {
+    alert("Nomination has not been started.");
+  }
+  // Check if nomination has ended
+  else if (currentDate > endDate) {
+    alert("Nomination has ended.");
+  }
+  // Nomination is active
+  else {
+    // Redirect to the desired URL
+    window.location.href = "https://www.youtube.com/watch?v=qiX_zSzjaTE";
+  }
+}
