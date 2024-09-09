@@ -77,3 +77,43 @@ function checkNomination() {
     window.location.href = "https://www.youtube.com/watch?v=qiX_zSzjaTE";
   }
 }
+
+// ========================================
+
+document
+  .getElementById("search-bar")
+  .addEventListener("input", async function () {
+    const query = this.value.toLowerCase();
+    const resultsContainer = document.getElementById("search-results");
+
+    if (query.length === 0) {
+      resultsContainer.style.display = "none";
+      return;
+    }
+
+    // Fetch routes from the server
+    const response = await fetch("/api/routes");
+    const routes = await response.json();
+
+    // Filter routes that match the query
+    const filteredRoutes = routes.filter((route) =>
+      route.toLowerCase().includes(query)
+    );
+
+    // Clear previous results
+    resultsContainer.innerHTML = "";
+
+    // Display filtered results
+    if (filteredRoutes.length > 0) {
+      filteredRoutes.forEach((route) => {
+        const link = document.createElement("a");
+        link.href = route;
+        link.textContent = route;
+        link.style.display = "block";
+        resultsContainer.appendChild(link);
+      });
+      resultsContainer.style.display = "block";
+    } else {
+      resultsContainer.style.display = "none";
+    }
+  });
