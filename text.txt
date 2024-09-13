@@ -1,1 +1,3 @@
 this file is text file for deleting git commands
+
+that line need to be deleted
