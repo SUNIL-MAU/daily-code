@@ -3,30 +3,64 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Countdown Timer</title>
-    <link rel="stylesheet" href="styles.css" />
+    <title>Responsive Infinite Multi-Card Slider</title>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <header>
-      <input type="text" id="searchInput" placeholder="Search for pages..." />
-      <ul id="searchResults" class="hidden"></ul>
-    </header>
-    <!-- <div id="countdown">
-      <h1>Countdown Timer</h1>
-      <div id="timer">
-        <span id="days"></span> Days <span id="hours"></span> Hours
-        <span id="minutes"></span> Minutes <span id="seconds"></span> Seconds
+    <div class="slider-container">
+      <button class="prev" onclick="moveSlider(-1)">&#10094;</button>
+      <div class="card-wrapper">
+        <div class="card-slider">
+          <div class="card">
+            <img src="https://via.placeholder.com/150" alt="Card 1 Image" />
+            <h3>Card 1 Title</h3>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
+              lacinia.
+            </p>
+          </div>
+          <div class="card">
+            <img src="https://via.placeholder.com/150" alt="Card 2 Image" />
+            <h3>Card 2 Title</h3>
+            <p>
+              Pellentesque ac felis tellus. Aenean sollicitudin imperdiet arcu.
+            </p>
+          </div>
+          <div class="card">
+            <img src="https://via.placeholder.com/150" alt="Card 3 Image" />
+            <h3>Card 3 Title</h3>
+            <p>
+              Donec viverra, eros quis accumsan dapibus, sapien urna aliquet
+              quam.
+            </p>
+          </div>
+          <div class="card">
+            <img src="https://via.placeholder.com/150" alt="Card 4 Image" />
+            <h3>Card 4 Title</h3>
+            <p>
+              Aenean eget massa fringilla, luctus mi a, finibus orci. Nulla ac
+              odio.
+            </p>
+          </div>
+          <div class="card">
+            <img src="https://via.placeholder.com/150" alt="Card 5 Image" />
+            <h3>Card 5 Title</h3>
+            <p>
+              Curabitur et mauris viverra, cursus arcu id, pellentesque est.
+            </p>
+          </div>
+          <div class="card">
+            <img src="https://via.placeholder.com/150" alt="Card 6 Image" />
+            <h3>Card 6 Title</h3>
+            <p>
+              Aliquam tincidunt, lectus non dictum feugiat, elit lectus pretium.
+            </p>
+          </div>
+        </div>
       </div>
-
-      <div class="container">
-        <button id="nominateBtn" onclick="checkNomination()">Nominate</button>
-      </div>
+      <button class="next" onclick="moveSlider(1)">&#10095;</button>
     </div>
 
-    <input type="text" id="search-bar" placeholder="Search pages..." />
-    <div id="search-results" style="display: none"></div>
-
-    <script src="script.js"></script> -->
     <script src="script.js"></script>
   </body>
 </html>

@@ -1,43 +1,68 @@
-/* styles.css */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
 }
 
-header {
+.slider-container {
     position: relative;
-    margin: 20px;
+    width: 80%;
+    overflow: hidden;
 }
 
-#searchInput {
-    padding: 10px;
-    width: 300px;
-    font-size: 16px;
+.card-wrapper {
+    overflow: hidden;
+    width: 100%;
 }
 
-#searchResults {
+.card-slider {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.card {
+    min-width: 200px;
+    margin: 0 15px;
+    background-color: #3498db;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 18px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.prev,
+.next {
     position: absolute;
-    top: 40px;
-    left: 0;
-    width: 300px;
-    border: 1px solid #ccc;
-    background-color: white;
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 1000;
-}
-
-#searchResults li {
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
     padding: 10px;
     cursor: pointer;
+    z-index: 1;
 }
 
-#searchResults li:hover {
-    background-color: #f0f0f0;
+.prev {
+    left: 0;
 }
 
-.hidden {
-    display: none;
+.next {
+    right: 0;
+}
+
+.prev:hover,
+.next:hover {
+    background-color: #333;
 }
