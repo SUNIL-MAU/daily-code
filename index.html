@@ -3,64 +3,187 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Responsive Infinite Multi-Card Slider</title>
-    <link rel="stylesheet" href="style.css" />
+    <title>Dynamic Decision Cards</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        line-height: 1.6;
+      }
+
+      .dropdown {
+        margin: 10px 0;
+      }
+
+      .card {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 15px;
+        margin: 15px 0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .card h3 {
+        margin: 0 0 10px;
+      }
+
+      .card p {
+        margin: 5px 0;
+      }
+
+      .card a {
+        display: inline-block;
+        margin: 5px 5px 0 0;
+        color: #007bff;
+        text-decoration: none;
+      }
+
+      .card a:hover {
+        text-decoration: underline;
+      }
+    </style>
   </head>
   <body>
-    <div class="slider-container">
-      <button class="prev" onclick="moveSlider(-1)">&#10094;</button>
-      <div class="card-wrapper">
-        <div class="card-slider">
-          <div class="card">
-            <img src="https://via.placeholder.com/150" alt="Card 1 Image" />
-            <h3>Card 1 Title</h3>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-              lacinia.
-            </p>
-          </div>
-          <div class="card">
-            <img src="https://via.placeholder.com/150" alt="Card 2 Image" />
-            <h3>Card 2 Title</h3>
-            <p>
-              Pellentesque ac felis tellus. Aenean sollicitudin imperdiet arcu.
-            </p>
-          </div>
-          <div class="card">
-            <img src="https://via.placeholder.com/150" alt="Card 3 Image" />
-            <h3>Card 3 Title</h3>
-            <p>
-              Donec viverra, eros quis accumsan dapibus, sapien urna aliquet
-              quam.
-            </p>
-          </div>
-          <div class="card">
-            <img src="https://via.placeholder.com/150" alt="Card 4 Image" />
-            <h3>Card 4 Title</h3>
-            <p>
-              Aenean eget massa fringilla, luctus mi a, finibus orci. Nulla ac
-              odio.
-            </p>
-          </div>
-          <div class="card">
-            <img src="https://via.placeholder.com/150" alt="Card 5 Image" />
-            <h3>Card 5 Title</h3>
-            <p>
-              Curabitur et mauris viverra, cursus arcu id, pellentesque est.
-            </p>
-          </div>
-          <div class="card">
-            <img src="https://via.placeholder.com/150" alt="Card 6 Image" />
-            <h3>Card 6 Title</h3>
-            <p>
-              Aliquam tincidunt, lectus non dictum feugiat, elit lectus pretium.
-            </p>
-          </div>
-        </div>
-      </div>
-      <button class="next" onclick="moveSlider(1)">&#10095;</button>
+    <h1>Decision Tree Cards</h1>
+
+    <div class="dropdown">
+      <label for="dropdown1">Who is this for:</label>
+      <select id="dropdown1"></select>
     </div>
 
-    <script src="script.js"></script>
+    <div class="dropdown">
+      <label for="dropdown2">What do you want to do?</label>
+      <select id="dropdown2"></select>
+    </div>
+
+    <div class="dropdown">
+      <label for="dropdown3">What is it?</label>
+      <select id="dropdown3"></select>
+    </div>
+
+    <div id="cards-container"></div>
+
+    <script>
+      // JSON data from the Excel file
+      const data = [
+        {
+          "Who is this for": "Bank internal audience",
+          "What do you want to do?": "Create",
+          "What is it?": "Presentation",
+          Heading: "Templates",
+          "Body text":
+            "Use cybersecurity pptx templates, brand images and icons. Follow brand guidelines on presenting information and best practices to engage your audience.",
+          Links: [
+            "Cybersecurity resources and templates",
+            "New electric look of HSBC cybersecurity",
+            "Pictogram library",
+          ],
+        },
+        {
+          "Who is this for": "Cybersecurity audience",
+          "What do you want to do?": "Create",
+          "What is it?": "Presentation",
+          Heading: "Templates",
+          "Body text":
+            "Use cybersecurity pptx templates, brand images and icons. Follow brand guidelines on presenting information and best practices to engage your audience.",
+          Links: [
+            "Cybersecurity resources and templates",
+            "New electric look of HSBC cybersecurity",
+            "Pictogram library",
+          ],
+        },
+        {
+          "Who is this for": "Bank internal audience",
+          "What do you want to do?": "Create",
+          "What is it?": "Video",
+          Heading: "Types of videos",
+          "Body text":
+            "We distinguish 2 most common types of corporate videos: supported by vendor or internally. Follow the relevant guides to learn more.",
+          Links: [
+            "Video you can create yourself - Guidance",
+            "Guide to commissioning video content",
+            "Corporate video - Explore the internal support option",
+          ],
+        },
+      ];
+
+      // Populate dropdowns dynamically
+      const dropdown1 = document.getElementById("dropdown1");
+      const dropdown2 = document.getElementById("dropdown2");
+      const dropdown3 = document.getElementById("dropdown3");
+      const cardsContainer = document.getElementById("cards-container");
+
+      function populateDropdown(dropdown, options) {
+        dropdown.innerHTML = '<option value="">Select an option</option>';
+        options.forEach((option) => {
+          const opt = document.createElement("option");
+          opt.value = option;
+          opt.textContent = option;
+          dropdown.appendChild(opt);
+        });
+      }
+
+      // Extract unique options for each dropdown
+      const options1 = [
+        ...new Set(data.map((item) => item["Who is this for"])),
+      ];
+      const options2 = [
+        ...new Set(data.map((item) => item["What do you want to do?"])),
+      ];
+      const options3 = [...new Set(data.map((item) => item["What is it?"]))];
+
+      populateDropdown(dropdown1, options1);
+      populateDropdown(dropdown2, options2);
+      populateDropdown(dropdown3, options3);
+
+      // Filter and display cards
+      function displayCards() {
+        const value1 = dropdown1.value;
+        const value2 = dropdown2.value;
+        const value3 = dropdown3.value;
+
+        // Filter data based on selections
+        const filteredData = data.filter(
+          (item) =>
+            (!value1 || item["Who is this for"] === value1) &&
+            (!value2 || item["What do you want to do?"] === value2) &&
+            (!value3 || item["What is it?"] === value3)
+        );
+
+        // Render cards
+        cardsContainer.innerHTML = "";
+        filteredData.forEach((item) => {
+          const card = document.createElement("div");
+          card.className = "card";
+
+          const heading = document.createElement("h3");
+          heading.textContent = item.Heading;
+
+          const body = document.createElement("p");
+          body.textContent = item["Body text"];
+
+          card.appendChild(heading);
+          card.appendChild(body);
+
+          if (item.Links) {
+            item.Links.forEach((link) => {
+              if (link) {
+                const anchor = document.createElement("a");
+                anchor.href = "#"; // Replace with actual link if available
+                anchor.textContent = link;
+                card.appendChild(anchor);
+              }
+            });
+          }
+
+          cardsContainer.appendChild(card);
+        });
+      }
+
+      // Add event listeners to dropdowns
+      dropdown1.addEventListener("change", displayCards);
+      dropdown2.addEventListener("change", displayCards);
+      dropdown3.addEventListener("change", displayCards);
+    </script>
   </body>
 </html>
