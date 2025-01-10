@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dynamic Decision Cards</title>
+    <title>Stepper Decision Tree</title>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -11,8 +11,17 @@
         line-height: 1.6;
       }
 
-      .dropdown {
-        margin: 10px 0;
+      .step {
+        margin: 20px 0;
+        display: none;
+      }
+
+      .step.active {
+        display: block;
+      }
+
+      .navigation {
+        margin: 20px 0;
       }
 
       .card {
@@ -41,30 +50,61 @@
       .card a:hover {
         text-decoration: underline;
       }
+
+      .dropdown {
+        margin: 10px 0;
+      }
+
+      .message {
+        color: red;
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
-    <h1>Decision Tree Cards</h1>
+    <h1>Decision Tree Stepper</h1>
 
-    <div class="dropdown">
-      <label for="dropdown1">Who is this for:</label>
-      <select id="dropdown1"></select>
+    <div id="step-1" class="step active">
+      <label>Step 1: Who is this for?</label><br />
+      <div id="radio-group-1"></div>
     </div>
 
-    <div class="dropdown">
-      <label for="dropdown2">What do you want to do?</label>
-      <select id="dropdown2"></select>
+    <div id="step-2" class="step">
+      <label>Step 2: What do you want to do?</label><br />
+      <div id="radio-group-2"></div>
     </div>
 
-    <div class="dropdown">
-      <label for="dropdown3">What is it?</label>
-      <select id="dropdown3"></select>
+    <div id="step-3" class="step">
+      <label>Step 3: What is it?</label><br />
+      <div id="radio-group-3"></div>
+    </div>
+
+    <div id="final-step" class="step">
+      <label>Adjust your selections:</label>
+      <div class="dropdown">
+        <label for="dropdown1">Who is this for:</label>
+        <select id="dropdown1"></select>
+      </div>
+
+      <div class="dropdown">
+        <label for="dropdown2">What do you want to do?</label>
+        <select id="dropdown2"></select>
+      </div>
+
+      <div class="dropdown">
+        <label for="dropdown3">What is it?</label>
+        <select id="dropdown3"></select>
+      </div>
+    </div>
+
+    <div class="navigation">
+      <button id="back-btn" disabled>Back</button>
+      <button id="next-btn">Next</button>
     </div>
 
     <div id="cards-container"></div>
 
     <script>
-      // JSON data from the Excel file
       const data = [
         {
           "Who is this for": "Bank internal audience",
@@ -107,23 +147,94 @@
         },
       ];
 
-      // Populate dropdowns dynamically
-      const dropdown1 = document.getElementById("dropdown1");
-      const dropdown2 = document.getElementById("dropdown2");
-      const dropdown3 = document.getElementById("dropdown3");
-      const cardsContainer = document.getElementById("cards-container");
+      let currentStep = 1;
 
-      function populateDropdown(dropdown, options) {
+      function populateRadioButtons(containerId, options) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = "";
+        options.forEach((option) => {
+          const label = document.createElement("label");
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = containerId;
+          input.value = option;
+          label.appendChild(input);
+          label.appendChild(document.createTextNode(option));
+          container.appendChild(label);
+          container.appendChild(document.createElement("br"));
+        });
+      }
+
+      function populateDropdown(dropdown, options, selectedValue) {
         dropdown.innerHTML = '<option value="">Select an option</option>';
         options.forEach((option) => {
           const opt = document.createElement("option");
           opt.value = option;
           opt.textContent = option;
+          if (option === selectedValue) opt.selected = true;
           dropdown.appendChild(opt);
         });
       }
 
-      // Extract unique options for each dropdown
+      function showStep(step) {
+        document.querySelectorAll(".step").forEach((el, index) => {
+          el.classList.toggle("active", index + 1 === step);
+        });
+        document.getElementById("back-btn").disabled = step === 1;
+        document.getElementById("next-btn").textContent =
+          step === 4 ? "Show Results" : "Next";
+      }
+
+      function displayCards() {
+        const value1 = dropdown1.value;
+        const value2 = dropdown2.value;
+        const value3 = dropdown3.value;
+
+        const filteredData = data.filter(
+          (item) =>
+            (!value1 || item["Who is this for"] === value1) &&
+            (!value2 || item["What do you want to do?"] === value2) &&
+            (!value3 || item["What is it?"] === value3)
+        );
+
+        cardsContainer.innerHTML = "";
+
+        if (filteredData.length > 0) {
+          filteredData.forEach((item) => {
+            const card = document.createElement("div");
+            card.className = "card";
+
+            const heading = document.createElement("h3");
+            heading.textContent = item.Heading;
+
+            const body = document.createElement("p");
+            body.textContent = item["Body text"];
+
+            card.appendChild(heading);
+            card.appendChild(body);
+
+            if (item.Links) {
+              item.Links.forEach((link) => {
+                if (link) {
+                  const anchor = document.createElement("a");
+                  anchor.href = "#";
+                  anchor.textContent = link;
+                  card.appendChild(anchor);
+                }
+              });
+            }
+
+            cardsContainer.appendChild(card);
+          });
+        } else {
+          const message = document.createElement("p");
+          message.className = "message";
+          message.textContent =
+            "Don't have combination with these options, please choose other options.";
+          cardsContainer.appendChild(message);
+        }
+      }
+
       const options1 = [
         ...new Set(data.map((item) => item["Who is this for"])),
       ];
@@ -132,55 +243,62 @@
       ];
       const options3 = [...new Set(data.map((item) => item["What is it?"]))];
 
-      populateDropdown(dropdown1, options1);
-      populateDropdown(dropdown2, options2);
-      populateDropdown(dropdown3, options3);
+      populateRadioButtons("radio-group-1", options1);
+      populateRadioButtons("radio-group-2", options2);
+      populateRadioButtons("radio-group-3", options3);
 
-      // Filter and display cards
-      function displayCards() {
-        const value1 = dropdown1.value;
-        const value2 = dropdown2.value;
-        const value3 = dropdown3.value;
+      const dropdown1 = document.getElementById("dropdown1");
+      const dropdown2 = document.getElementById("dropdown2");
+      const dropdown3 = document.getElementById("dropdown3");
+      const cardsContainer = document.getElementById("cards-container");
 
-        // Filter data based on selections
-        const filteredData = data.filter(
-          (item) =>
-            (!value1 || item["Who is this for"] === value1) &&
-            (!value2 || item["What do you want to do?"] === value2) &&
-            (!value3 || item["What is it?"] === value3)
-        );
+      populateDropdown(dropdown1, options1, null);
+      populateDropdown(dropdown2, options2, null);
+      populateDropdown(dropdown3, options3, null);
 
-        // Render cards
-        cardsContainer.innerHTML = "";
-        filteredData.forEach((item) => {
-          const card = document.createElement("div");
-          card.className = "card";
+      document.getElementById("back-btn").addEventListener("click", () => {
+        if (currentStep > 1) {
+          currentStep--;
+          showStep(currentStep);
+        }
+      });
 
-          const heading = document.createElement("h3");
-          heading.textContent = item.Heading;
+      document.getElementById("next-btn").addEventListener("click", () => {
+        if (currentStep < 4) {
+          currentStep++;
+          if (currentStep === 4) {
+            const selected1 = document.querySelector(
+              'input[name="radio-group-1"]:checked'
+            );
+            const selected2 = document.querySelector(
+              'input[name="radio-group-2"]:checked'
+            );
+            const selected3 = document.querySelector(
+              'input[name="radio-group-3"]:checked'
+            );
 
-          const body = document.createElement("p");
-          body.textContent = item["Body text"];
+            populateDropdown(
+              dropdown1,
+              options1,
+              selected1 ? selected1.value : null
+            );
+            populateDropdown(
+              dropdown2,
+              options2,
+              selected2 ? selected2.value : null
+            );
+            populateDropdown(
+              dropdown3,
+              options3,
+              selected3 ? selected3.value : null
+            );
 
-          card.appendChild(heading);
-          card.appendChild(body);
-
-          if (item.Links) {
-            item.Links.forEach((link) => {
-              if (link) {
-                const anchor = document.createElement("a");
-                anchor.href = "#"; // Replace with actual link if available
-                anchor.textContent = link;
-                card.appendChild(anchor);
-              }
-            });
+            displayCards();
           }
+          showStep(currentStep);
+        }
+      });
 
-          cardsContainer.appendChild(card);
-        });
-      }
-
-      // Add event listeners to dropdowns
       dropdown1.addEventListener("change", displayCards);
       dropdown2.addEventListener("change", displayCards);
       dropdown3.addEventListener("change", displayCards);
