@@ -120,6 +120,19 @@
           ],
         },
         {
+          "Who is this for": " Internal audience",
+          "What do you want to do?": "Update",
+          "What is it?": "Presentation",
+          Heading: "Templates",
+          "Body text":
+            "Use cybersecurity pptx templates, brand images and icons. Follow brand guidelines on presenting information and best practices to engage your audience.",
+          Links: [
+            "Cybersecurity resources and templates",
+            "New electric look of HSBC cybersecurity",
+            "Pictogram library",
+          ],
+        },
+        {
           "Who is this for": "Cybersecurity audience",
           "What do you want to do?": "Create",
           "What is it?": "Presentation",
@@ -149,7 +162,8 @@
 
       let currentStep = 1;
 
-      function populateRadioButtons(containerId, options) {
+      // Function to populate radio buttons dynamically
+      const populateRadioButtons = (containerId, options) => {
         const container = document.getElementById(containerId);
         container.innerHTML = "";
         options.forEach((option) => {
@@ -163,9 +177,10 @@
           container.appendChild(label);
           container.appendChild(document.createElement("br"));
         });
-      }
+      };
 
-      function populateDropdown(dropdown, options, selectedValue) {
+      // Function to populate dropdowns
+      const populateDropdown = (dropdown, options, selectedValue) => {
         dropdown.innerHTML = '<option value="">Select an option</option>';
         options.forEach((option) => {
           const opt = document.createElement("option");
@@ -174,27 +189,35 @@
           if (option === selectedValue) opt.selected = true;
           dropdown.appendChild(opt);
         });
-      }
+      };
 
-      function showStep(step) {
+      // Function to display the current step
+      const showStep = (step) => {
         document.querySelectorAll(".step").forEach((el, index) => {
           el.classList.toggle("active", index + 1 === step);
         });
         document.getElementById("back-btn").disabled = step === 1;
         document.getElementById("next-btn").textContent =
           step === 4 ? "Show Results" : "Next";
-      }
+      };
 
-      function displayCards() {
-        const value1 = dropdown1.value;
-        const value2 = dropdown2.value;
-        const value3 = dropdown3.value;
+      // Function to display the cards based on selections
+      const displayCards = () => {
+        const selectedValues = [
+          dropdown1.value,
+          dropdown2.value,
+          dropdown3.value,
+        ];
 
-        const filteredData = data.filter(
-          (item) =>
-            (!value1 || item["Who is this for"] === value1) &&
-            (!value2 || item["What do you want to do?"] === value2) &&
-            (!value3 || item["What is it?"] === value3)
+        const filteredData = data.filter((item) =>
+          selectedValues.every((value, index) => {
+            const keys = [
+              "Who is this for",
+              "What do you want to do?",
+              "What is it?",
+            ];
+            return !value || item[keys[index]] === value;
+          })
         );
 
         cardsContainer.innerHTML = "";
@@ -233,15 +256,16 @@
             "Don't have combination with these options, please choose other options.";
           cardsContainer.appendChild(message);
         }
-      }
+      };
 
-      const options1 = [
-        ...new Set(data.map((item) => item["Who is this for"])),
+      // Populate options dynamically from data
+      const getUniqueOptions = (key) => [
+        ...new Set(data.map((item) => item[key])),
       ];
-      const options2 = [
-        ...new Set(data.map((item) => item["What do you want to do?"])),
-      ];
-      const options3 = [...new Set(data.map((item) => item["What is it?"]))];
+
+      const options1 = getUniqueOptions("Who is this for");
+      const options2 = getUniqueOptions("What do you want to do?");
+      const options3 = getUniqueOptions("What is it?");
 
       populateRadioButtons("radio-group-1", options1);
       populateRadioButtons("radio-group-2", options2);
@@ -252,10 +276,11 @@
       const dropdown3 = document.getElementById("dropdown3");
       const cardsContainer = document.getElementById("cards-container");
 
-      populateDropdown(dropdown1, options1, null);
-      populateDropdown(dropdown2, options2, null);
-      populateDropdown(dropdown3, options3, null);
+      populateDropdown(dropdown1, options1);
+      populateDropdown(dropdown2, options2);
+      populateDropdown(dropdown3, options3);
 
+      // Event listeners for navigation buttons
       document.getElementById("back-btn").addEventListener("click", () => {
         if (currentStep > 1) {
           currentStep--;
@@ -299,6 +324,7 @@
         }
       });
 
+      // Event listeners for dropdown changes
       dropdown1.addEventListener("change", displayCards);
       dropdown2.addEventListener("change", displayCards);
       dropdown3.addEventListener("change", displayCards);
