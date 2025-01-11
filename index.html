@@ -25,7 +25,7 @@
       }
 
       .progress-bar {
-        height: 20px;
+        height: 4px;
         background-color: #f3f3f3;
         border-radius: 10px;
         overflow: hidden;
@@ -116,6 +116,8 @@
         <label for="dropdown3">What is it?</label>
         <select id="dropdown3"></select>
       </div>
+
+      <button id="continue-btn">Continue</button>
 
       <div id="cards-container"></div>
     </div>
@@ -329,14 +331,19 @@
             if (selected3) dropdown3.value = selected3.value;
 
             displayCards();
+            const navigation = document.querySelector(".navigation");
+            navigation.style.display = "none";
           }
           showStep(currentStep);
         }
       });
 
-      dropdown1.addEventListener("change", displayCards);
-      dropdown2.addEventListener("change", displayCards);
-      dropdown3.addEventListener("change", displayCards);
+      document.getElementById("continue-btn").addEventListener("click", () => {
+        displayCards();
+      });
+      // dropdown1.addEventListener("change", displayCards);
+      // dropdown2.addEventListener("change", displayCards);
+      // dropdown3.addEventListener("change", displayCards);
     </script>
   </body>
 </html>
