@@ -203,6 +203,7 @@
       let currentStep = 1;
       let stepSelections = {};
 
+      // Utility to populate radio buttons
       function populateRadioButtons(containerId, options) {
         const container = document.getElementById(containerId);
         container.innerHTML = "";
@@ -223,6 +224,7 @@
         });
       }
 
+      // Utility to populate dropdown options
       function populateDropdown(dropdown, options, selectedValue) {
         dropdown.innerHTML = '<option value="">Select an option</option>';
         options.forEach((option) => {
@@ -234,6 +236,7 @@
         });
       }
 
+      // Utility to display the correct step
       function showStep(step) {
         document.querySelectorAll(".step").forEach((el, index) => {
           el.classList.toggle("active", index + 1 === step);
@@ -243,20 +246,15 @@
         const nextBtn = document.getElementById("next-btn");
 
         backBtn.style.display = step === 1 ? "none" : "inline-block";
-        if (step === 4) {
-          nextBtn.textContent = "Result";
-        } else {
-          nextBtn.textContent = "Next";
-        }
+        nextBtn.textContent = step === 4 ? "Result" : "Next";
 
         const progressBar = document.getElementById("progress-bar-inner");
         progressBar.style.width = `${(step - 1) * (100 / 3)}%`;
 
-        if (stepSelections[`radio-group-${step}`]) {
+        const selectedOption = stepSelections[`radio-group-${step}`];
+        if (selectedOption) {
           document.querySelector(
-            `input[name="radio-group-${step}"][value="${
-              stepSelections[`radio-group-${step}`]
-            }"]`
+            `input[name="radio-group-${step}"][value="${selectedOption}"]`
           ).checked = true;
           nextBtn.disabled = false;
         } else {
@@ -264,6 +262,7 @@
         }
       }
 
+      // Utility to display cards based on filtered data
       function displayCards() {
         const value1 = dropdown1.value;
         const value2 = dropdown2.value;
@@ -277,33 +276,10 @@
         );
 
         cardsContainer.innerHTML = "";
-        console.log({ filteredData });
         if (filteredData.length > 0) {
           filteredData.forEach((item) => {
             item.cards.forEach((card) => {
-              const cardElement = document.createElement("div");
-              cardElement.className = "card";
-
-              const heading = document.createElement("h3");
-              heading.textContent = card.Heading;
-
-              const body = document.createElement("p");
-              body.textContent = card["Body text"];
-
-              cardElement.appendChild(heading);
-              cardElement.appendChild(body);
-
-              if (card.Links) {
-                card.Links.forEach((link) => {
-                  if (link) {
-                    const anchor = document.createElement("a");
-                    anchor.href = "#";
-                    anchor.textContent = link;
-                    cardElement.appendChild(anchor);
-                  }
-                });
-              }
-
+              const cardElement = createCardElement(card);
               cardsContainer.appendChild(cardElement);
             });
           });
@@ -316,6 +292,36 @@
         }
       }
 
+      // Utility to create a card element
+      function createCardElement(card) {
+        const cardElement = document.createElement("div");
+        cardElement.className = "card";
+
+        const heading = document.createElement("h3");
+        heading.textContent = card.Heading;
+
+        const body = document.createElement("p");
+        body.textContent = card["Body text"];
+
+        cardElement.appendChild(heading);
+        cardElement.appendChild(body);
+
+        if (card.Links) {
+          card.Links.forEach((link) => {
+            if (link) {
+              const anchor = document.createElement("a");
+              anchor.href = "#";
+              anchor.style.display = "block";
+              anchor.textContent = link;
+              cardElement.appendChild(anchor);
+            }
+          });
+        }
+
+        return cardElement;
+      }
+
+      // Prepare options for radio buttons and dropdowns
       const options1 = [
         ...new Set(data.map((item) => item["Who is this for"])),
       ];
@@ -337,6 +343,7 @@
       populateDropdown(dropdown2, options2, null);
       populateDropdown(dropdown3, options3, null);
 
+      // Event listeners for step navigation
       document.getElementById("back-btn").addEventListener("click", () => {
         if (currentStep > 1) {
           currentStep--;
@@ -348,23 +355,9 @@
         if (currentStep < 4) {
           currentStep++;
           if (currentStep === 4) {
-            const selected1 = document.querySelector(
-              'input[name="radio-group-1"]:checked'
-            );
-            const selected2 = document.querySelector(
-              'input[name="radio-group-2"]:checked'
-            );
-            const selected3 = document.querySelector(
-              'input[name="radio-group-3"]:checked'
-            );
-
-            if (selected1) dropdown1.value = selected1.value;
-            if (selected2) dropdown2.value = selected2.value;
-            if (selected3) dropdown3.value = selected3.value;
-
+            updateDropdownsFromSelections();
             displayCards();
-            const navigation = document.querySelector(".navigation");
-            navigation.style.display = "none";
+            document.querySelector(".navigation").style.display = "none";
           }
           showStep(currentStep);
         }
@@ -373,6 +366,23 @@
       document.getElementById("continue-btn").addEventListener("click", () => {
         displayCards();
       });
+
+      // Utility to update dropdowns from selected radio options
+      function updateDropdownsFromSelections() {
+        const selected1 = document.querySelector(
+          'input[name="radio-group-1"]:checked'
+        );
+        const selected2 = document.querySelector(
+          'input[name="radio-group-2"]:checked'
+        );
+        const selected3 = document.querySelector(
+          'input[name="radio-group-3"]:checked'
+        );
+
+        if (selected1) dropdown1.value = selected1.value;
+        if (selected2) dropdown2.value = selected2.value;
+        if (selected3) dropdown3.value = selected3.value;
+      }
     </script>
   </body>
 </html>
