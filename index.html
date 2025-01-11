@@ -127,46 +127,75 @@
       <button id="back-btn" style="display: none">Back</button>
       <button id="next-btn" disabled>Next</button>
     </div>
-
     <script>
       const data = [
         {
           "Who is this for": "Bank internal audience",
           "What do you want to do?": "Create",
           "What is it?": "Presentation",
-          Heading: "Templates",
-          "Body text":
-            "Use cybersecurity pptx templates, brand images and icons. Follow brand guidelines on presenting information and best practices to engage your audience.",
-          Links: [
-            "Cybersecurity resources and templates",
-            "New electric look of HSBC cybersecurity",
-            "Pictogram library",
+          cards: [
+            {
+              Heading: "Templates",
+              "Body text":
+                "Use cybersecurity pptx templates, brand images and icons. Follow brand guidelines on presenting information and best practices to engage your audience.",
+              Links: [
+                "Cybersecurity resources and templates",
+                "New electric look of HSBC cybersecurity",
+                "Pictogram library",
+              ],
+            },
+            {
+              Heading: "Cybersecurity Best Practices",
+              "Body text":
+                "Follow the best practices for cybersecurity in presentations to ensure compliance with internal policies and avoid risks.",
+              Links: [
+                "Cybersecurity guidelines",
+                "Internal security protocols",
+              ],
+            },
           ],
         },
         {
           "Who is this for": "Cybersecurity audience",
           "What do you want to do?": "Create",
           "What is it?": "Presentation",
-          Heading: "Templates",
-          "Body text":
-            "Use cybersecurity pptx templates, brand images and icons. Follow brand guidelines on presenting information and best practices to engage your audience.",
-          Links: [
-            "Cybersecurity resources and templates",
-            "New electric look of HSBC cybersecurity",
-            "Pictogram library",
+          cards: [
+            {
+              Heading: "Templates",
+              "Body text":
+                "Use cybersecurity pptx templates, brand images and icons. Follow brand guidelines on presenting information and best practices to engage your audience.",
+              Links: [
+                "Cybersecurity resources and templates",
+                "New electric look of HSBC cybersecurity",
+                "Pictogram library",
+              ],
+            },
           ],
         },
         {
           "Who is this for": "Bank internal audience",
           "What do you want to do?": "Create",
           "What is it?": "Video",
-          Heading: "Types of videos",
-          "Body text":
-            "We distinguish 2 most common types of corporate videos: supported by vendor or internally. Follow the relevant guides to learn more.",
-          Links: [
-            "Video you can create yourself - Guidance",
-            "Guide to commissioning video content",
-            "Corporate video - Explore the internal support option",
+          cards: [
+            {
+              Heading: "Types of videos",
+              "Body text":
+                "We distinguish 2 most common types of corporate videos: supported by vendor or internally. Follow the relevant guides to learn more.",
+              Links: [
+                "Video you can create yourself - Guidance",
+                "Guide to commissioning video content",
+                "Corporate video - Explore the internal support option",
+              ],
+            },
+            {
+              Heading: "Video Production Tips",
+              "Body text":
+                "Learn how to optimize video production for better quality and faster turnaround time.",
+              Links: [
+                "Video editing tips",
+                "Lighting and sound setup for corporate videos",
+              ],
+            },
           ],
         },
       ];
@@ -248,33 +277,35 @@
         );
 
         cardsContainer.innerHTML = "";
-
+        console.log({ filteredData });
         if (filteredData.length > 0) {
           filteredData.forEach((item) => {
-            const card = document.createElement("div");
-            card.className = "card";
+            item.cards.forEach((card) => {
+              const cardElement = document.createElement("div");
+              cardElement.className = "card";
 
-            const heading = document.createElement("h3");
-            heading.textContent = item.Heading;
+              const heading = document.createElement("h3");
+              heading.textContent = card.Heading;
 
-            const body = document.createElement("p");
-            body.textContent = item["Body text"];
+              const body = document.createElement("p");
+              body.textContent = card["Body text"];
 
-            card.appendChild(heading);
-            card.appendChild(body);
+              cardElement.appendChild(heading);
+              cardElement.appendChild(body);
 
-            if (item.Links) {
-              item.Links.forEach((link) => {
-                if (link) {
-                  const anchor = document.createElement("a");
-                  anchor.href = "#";
-                  anchor.textContent = link;
-                  card.appendChild(anchor);
-                }
-              });
-            }
+              if (card.Links) {
+                card.Links.forEach((link) => {
+                  if (link) {
+                    const anchor = document.createElement("a");
+                    anchor.href = "#";
+                    anchor.textContent = link;
+                    cardElement.appendChild(anchor);
+                  }
+                });
+              }
 
-            cardsContainer.appendChild(card);
+              cardsContainer.appendChild(cardElement);
+            });
           });
         } else {
           const message = document.createElement("p");
@@ -342,9 +373,6 @@
       document.getElementById("continue-btn").addEventListener("click", () => {
         displayCards();
       });
-      // dropdown1.addEventListener("change", displayCards);
-      // dropdown2.addEventListener("change", displayCards);
-      // dropdown3.addEventListener("change", displayCards);
     </script>
   </body>
 </html>
