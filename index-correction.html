@@ -1,5 +1,3 @@
-// Fixed code to address the issue where combinations are not shown correctly
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -152,6 +150,7 @@
           container.appendChild(document.createElement("br"));
           input.addEventListener("change", () => {
             stepSelections[containerId] = option;
+            updateProgressBar(containerId);
             document.getElementById("next-btn").disabled = false;
           });
         });
@@ -181,8 +180,8 @@
         backBtn.style.display = step === 1 ? "none" : "inline-block";
         nextBtn.textContent = step === 4 ? "Result" : "Next";
 
-        const progressBar = document.getElementById("progress-bar-inner");
-        progressBar.style.width = `${(step - 1) * (100 / 3)}%`;
+        const stepHeading = document.getElementById("step-heading");
+        stepHeading.textContent = `Step ${step}/3`;
 
         const selectedOption = stepSelections[`radio-group-${step}`];
         if (selectedOption) {
@@ -193,6 +192,13 @@
         } else {
           nextBtn.disabled = true;
         }
+      }
+
+      // Utility to update the progress bar
+      function updateProgressBar(containerId) {
+        const step = parseInt(containerId.replace("radio-group-", ""));
+        const progressBar = document.getElementById("progress-bar-inner");
+        progressBar.style.width = `${step * (100 / 3)}%`;
       }
 
       // Utility to display cards based on filtered data
