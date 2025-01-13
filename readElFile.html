@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Read XLSX and Convert to JSON</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  </head>
+  <body>
+    <h1>Upload XLSX File</h1>
+    <input type="file" id="fileInput" accept=".xlsx" />
+    <pre id="output"></pre>
+
+    <script>
+      document
+        .getElementById("fileInput")
+        .addEventListener("change", handleFile);
+
+      async function handleFile(event) {
+        const file = event.target.files[0];
+        if (!file) {
+          alert("No file selected");
+          return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = async (e) => {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: "array" });
+
+          // Assume data is in the first sheet
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+
+          // Parse the sheet into JSON
+          const rawJson = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+          // Convert raw JSON to desired structure
+          const formattedJson = transformToDesiredFormat(rawJson);
+          console.log({ formattedJson });
+
+          // Display result
+          document.getElementById("output").textContent = JSON.stringify(
+            formattedJson,
+            null,
+            2
+          );
+          console.log(formattedJson); // Log to console as well
+        };
+
+        reader.readAsArrayBuffer(file);
+      }
+
+      function transformToDesiredFormat(rawData) {
+        const result = [];
+
+        // Extract headers and data rows
+        const headers = rawData[2]; // Third row contains headers
+        const dataRows = rawData.slice(3); // Data starts from the fourth row
+
+        // Iterate through rows and group by selection panel columns
+        const groupedData = {};
+        dataRows.forEach((row) => {
+          const [who, action, what, heading, bodyText, ...links] = row;
+
+          if (!who || !action || !what) return; // Skip rows without main grouping info
+
+          // Create a unique key for grouping
+          const key = `${who}||${action}||${what}`;
+          if (!groupedData[key]) {
+            groupedData[key] = {
+              "Who is this for": who,
+              "What do you want to do?": action,
+              "What is it?": what,
+              cards: [],
+            };
+          }
+
+          // Add card information
+          if (heading && bodyText) {
+            groupedData[key].cards.push({
+              Heading: heading,
+              "Body text": bodyText,
+              Links: links.filter((link) => link), // Remove empty links
+            });
+          }
+        });
+
+        // Convert grouped data to an array
+        Object.values(groupedData).forEach((entry) => result.push(entry));
+
+        return result;
+      }
+
+      const j = {
+        "Who is this for": "Bank internal audience",
+        "What do you want to do?": "Create",
+        "What is it?": "Presentation",
+        cards: [
+          {
+            Heading: "Templates",
+            "Body text":
+              "Use cybersecurity pptx templates, brand images and icons. Follow brand guidelines on presenting information and best practices to engage your audience.  ",
+            Links: [
+              {
+                link: "https://www.hsbc.com/en/cybersecurity/presentations-and-guidelines/",
+                text: "Cybersecurity resources and templates",
+              },
+              {
+                link: "https://www.hsbc.com/en/cybersecurity/presentations-and-guidelines/",
+                text: "New electric look of HSBC cybersecurity",
+              },
+              {
+                link: "https://www.hsbc.com/en/cybersecurity/presentations-and-guidelines/",
+                text: "Pictogram library",
+              },
+            ],
+          },
+          {
+            Heading: "Standards",
+            "Body text": "Adhere to HSBC presentation standards.",
+            Links: [
+              {
+                link: "https://www.hsbc.com/en/cybersecurity/presentations-and-guidelines/",
+                text: "Presentations: PowerPoint",
+              },
+              {
+                link: "https://www.hsbc.com/en/cybersecurity/presentations-and-guidelines/",
+                text: "Presentations: Keynote",
+              },
+              {
+                link: "https://www.hsbc.com/en/cybersecurity/presentations-and-guidelines/",
+                text: "Presentation skills",
+              },
+            ],
+          },
+          {
+            Heading: "Copy guidelines",
+            "Body text":
+              "Follow the global style guide and incorporate HSBC tone of voice.",
+            Links: [
+              {
+                link: "https://www.hsbc.com/en/cybersecurity/presentations-and-guidelines/",
+                text: "Digital editorial style guide ",
+              },
+              {
+                link: "https://www.hsbc.com/en/cybersecurity/presentations-and-guidelines/",
+                text: "Preferred terms",
+              },
+              {
+                link: "https://www.hsbc.com/en/cybersecurity/presentations-and-guidelines/",
+                text: "Tone of voice",
+              },
+            ],
+          },
+          {
+            Heading: "Support",
+            "Body text":
+              "If you need additional support or advice, consult Design and UX",
+            Links: [
+              {
+                link: "https://www.hsbc.com/en/cybersecurity/presentations-and-guidelines/",
+                text: "Visit our page",
+              },
+              {
+                link: "https://www.hsbc.com/en/cybersecurity/presentations-and-guidelines/",
+                text: "Contact us",
+              },
+            ],
+          },
+        ],
+      };
+    </script>
+  </body>
+</html>

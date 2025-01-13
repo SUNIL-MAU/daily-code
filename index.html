@@ -35,7 +35,7 @@
       .progress-bar-inner {
         height: 100%;
         width: 0%;
-        background-color: #4caf50;
+        background-color: #de1a1a;
         transition: width 0.3s ease;
       }
 
@@ -127,78 +127,9 @@
       <button id="back-btn" style="display: none">Back</button>
       <button id="next-btn" disabled>Next</button>
     </div>
+    <script src="data-with-links.js"></script>
     <script>
-      const data = [
-        {
-          "Who is this for": "Bank internal audience",
-          "What do you want to do?": "Create",
-          "What is it?": "Presentation",
-          cards: [
-            {
-              Heading: "Templates",
-              "Body text":
-                "Use cybersecurity pptx templates, brand images and icons. Follow brand guidelines on presenting information and best practices to engage your audience.",
-              Links: [
-                "Cybersecurity resources and templates",
-                "New electric look of HSBC cybersecurity",
-                "Pictogram library",
-              ],
-            },
-            {
-              Heading: "Cybersecurity Best Practices",
-              "Body text":
-                "Follow the best practices for cybersecurity in presentations to ensure compliance with internal policies and avoid risks.",
-              Links: [
-                "Cybersecurity guidelines",
-                "Internal security protocols",
-              ],
-            },
-          ],
-        },
-        {
-          "Who is this for": "Cybersecurity audience",
-          "What do you want to do?": "Create",
-          "What is it?": "Presentation",
-          cards: [
-            {
-              Heading: "Templates",
-              "Body text":
-                "Use cybersecurity pptx templates, brand images and icons. Follow brand guidelines on presenting information and best practices to engage your audience.",
-              Links: [
-                "Cybersecurity resources and templates",
-                "New electric look of HSBC cybersecurity",
-                "Pictogram library",
-              ],
-            },
-          ],
-        },
-        {
-          "Who is this for": "Bank internal audience",
-          "What do you want to do?": "Create",
-          "What is it?": "Video",
-          cards: [
-            {
-              Heading: "Types of videos",
-              "Body text":
-                "We distinguish 2 most common types of corporate videos: supported by vendor or internally. Follow the relevant guides to learn more.",
-              Links: [
-                "Video you can create yourself - Guidance",
-                "Guide to commissioning video content",
-                "Corporate video - Explore the internal support option",
-              ],
-            },
-            {
-              Heading: "Video Production Tips",
-              "Body text":
-                "Learn how to optimize video production for better quality and faster turnaround time.",
-              Links: [
-                "Video editing tips",
-                "Lighting and sound setup for corporate videos",
-              ],
-            },
-          ],
-        },
-      ];
+      console.log({ data });
 
       let currentStep = 1;
       let stepSelections = {};
@@ -310,9 +241,9 @@
           card.Links.forEach((link) => {
             if (link) {
               const anchor = document.createElement("a");
-              anchor.href = "#";
+              anchor.href = link.link;
               anchor.style.display = "block";
-              anchor.textContent = link;
+              anchor.textContent = link.text;
               cardElement.appendChild(anchor);
             }
           });

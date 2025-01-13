@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Read XLSX and Extract Links</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  </head>
+  <body>
+    <h1>Upload XLSX File</h1>
+    <input type="file" id="fileInput" accept=".xlsx" />
+    <button id="downloadJson" disabled>Download JSON</button>
+    <pre id="output"></pre>
+
+    <script>
+      let formattedJson = []; // Global variable to hold the JSON data
+
+      document
+        .getElementById("fileInput")
+        .addEventListener("change", handleFile);
+      document
+        .getElementById("downloadJson")
+        .addEventListener("click", downloadJSONFile);
+
+      function handleFile(event) {
+        const file = event.target.files[0];
+        if (!file) {
+          alert("No file selected");
+          return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: "array" });
+
+          // Assume data is in the first sheet
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+
+          // Parse the sheet into JSON (array of arrays)
+          const rawJson = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+          // Extract hyperlinks using workbook metadata
+          const hyperlinks = extractHyperlinks(sheet);
+
+          // Convert raw JSON to the desired structure
+          formattedJson = transformToDesiredFormat(rawJson, hyperlinks);
+
+          // Enable the download button
+          document.getElementById("downloadJson").disabled = false;
+
+          // Display the result
+          document.getElementById("output").textContent = JSON.stringify(
+            formattedJson,
+            null,
+            2
+          );
+          console.log(formattedJson); // Log to console
+        };
+
+        reader.readAsArrayBuffer(file);
+      }
+
+      function extractHyperlinks(sheet) {
+        const hyperlinks = {};
+        Object.keys(sheet).forEach((cell) => {
+          if (sheet[cell].l && sheet[cell].l.Target) {
+            hyperlinks[cell] = sheet[cell].l.Target;
+          }
+        });
+        return hyperlinks;
+      }
+
+      function transformToDesiredFormat(rawData, hyperlinks) {
+        const result = [];
+
+        // Header row: extract column names
+        const headers = rawData[0];
+        const dataRows = rawData.slice(1); // Skip header row
+
+        let currentGroup = null;
+
+        dataRows.forEach((row, rowIndex) => {
+          const [who, action, what, heading, bodyText, ...links] = row;
+
+          // Check if this is a new group
+          if (who && action && what) {
+            // Push the previous group (if it exists)
+            if (currentGroup) {
+              result.push(currentGroup);
+            }
+
+            // Create a new group
+            currentGroup = {
+              "Who is this for": who,
+              "What do you want to do?": action,
+              "What is it?": what,
+              cards: [],
+            };
+          }
+
+          // Add card information to the current group
+          if (currentGroup && heading && bodyText) {
+            currentGroup.cards.push({
+              Heading: heading,
+              "Body text": bodyText,
+              Links: links
+                .filter((text, colIndex) => text)
+                .map((text, colIndex) => {
+                  const cellAddress = XLSX.utils.encode_cell({
+                    r: rowIndex + 1, // Adjust for header row
+                    c: 5 + colIndex, // Links start at column 5
+                  });
+                  return {
+                    link: hyperlinks[cellAddress] || "", // Use extracted hyperlink
+                    text: text.trim(), // Trim spaces from the link text
+                  };
+                }),
+            });
+          }
+        });
+
+        // Push the final group
+        if (currentGroup) {
+          result.push(currentGroup);
+        }
+
+        return result;
+      }
+
+      function downloadJSONFile() {
+        // Convert the JSON object to a string
+        const jsonString = JSON.stringify(formattedJson, null, 2);
+
+        // Create a Blob with the JSON data
+        const blob = new Blob([jsonString], { type: "application/json" });
+
+        // Create a temporary download link
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "data.json"; // Name of the downloaded file
+        link.click();
+
+        // Clean up the temporary link
+        URL.revokeObjectURL(link.href);
+      }
+    </script>
+  </body>
+</html>
