@@ -127,10 +127,10 @@
       <button id="back-btn" style="display: none">Back</button>
       <button id="next-btn" disabled>Next</button>
     </div>
+    <script src="steps-combinations.js"></script>
+
     <script src="data-with-links.js"></script>
     <script>
-      console.log({ data });
-
       let currentStep = 1;
       let stepSelections = {};
 
@@ -155,6 +155,10 @@
           });
         });
       }
+
+      document.getElementById("dropdown2").addEventListener("change", () => {
+        const selectedValue = document.getElementById("dropdown2").value;
+      });
 
       // Utility to populate dropdown options
       function populateDropdown(dropdown, options, selectedValue) {
@@ -203,15 +207,20 @@
 
       // Utility to display cards based on filtered data
       function displayCards() {
-        const value1 = dropdown1.value;
-        const value2 = dropdown2.value;
-        const value3 = dropdown3.value;
+        const value1 = stepSelections["radio-group-1"].trim();
+        const value2 = stepSelections["radio-group-2"].trim();
+        const value3 = stepSelections["radio-group-3"].trim();
+        console.log("value1", value1);
+        console.log("value2", value2);
+
+        console.log("value3", value3);
+        console.log(stepSelections, stepSelections);
 
         const filteredData = data.filter(
           (item) =>
-            (!value1 || item["Who is this for"] === value1) &&
-            (!value2 || item["What do you want to do?"] === value2) &&
-            (!value3 || item["What is it?"] === value3)
+            (!value1 || item["Who is this for"].trim() === value1) &&
+            (!value2 || item["What do you want to do?"].trim() === value2) &&
+            (!value3 || item["What is it?"].trim() === value3)
         );
 
         cardsContainer.innerHTML = "";
@@ -271,7 +280,30 @@
 
       populateRadioButtons("radio-group-1", options1);
       populateRadioButtons("radio-group-2", options2);
-      populateRadioButtons("radio-group-3", options3);
+
+      function validateOptions(options) {
+        if (!Array.isArray(options)) {
+          alert.error("Invalid options passed to populateRadioButtons");
+          return [];
+        }
+        return options;
+      }
+      function getStep3Options(selected1, selected2) {
+        const matchedStep = dynamicSteps.find(
+          (step) =>
+            step["Who is this for"] === selected1 &&
+            step["What do you want to do?"] === selected2
+        );
+        console.log("matchedStep", matchedStep);
+        return validateOptions(matchedStep ? matchedStep["What is it?"] : []);
+      }
+      function populateStep3(selected1, selected2) {
+        const step3Options = getStep3Options(selected1, selected2);
+
+        populateRadioButtons("radio-group-3", step3Options);
+        stepSelections["radio-group-3"] = null;
+        document.getElementById("next-btn").disabled = true;
+      }
 
       const dropdown1 = document.getElementById("dropdown1");
       const dropdown2 = document.getElementById("dropdown2");
@@ -280,7 +312,11 @@
 
       populateDropdown(dropdown1, options1, null);
       populateDropdown(dropdown2, options2, null);
-      populateDropdown(dropdown3, options3, null);
+
+      function updateDropdownsFromSelections(selected1, selected2) {
+        const step3Options = getStep3Options(selected1, selected2);
+        populateDropdown(dropdown3, step3Options, null);
+      }
 
       // Event listeners for step navigation
       document.getElementById("back-btn").addEventListener("click", () => {
@@ -288,15 +324,32 @@
           currentStep--;
           showStep(currentStep);
         }
+        console.log("stepSelections", stepSelections);
+        if (
+          stepSelections["radio-group-1"] &&
+          stepSelections["radio-group-2"] &&
+          currentStep === 3
+        ) {
+          populateStep3(
+            stepSelections["radio-group-1"],
+            stepSelections["radio-group-2"]
+          );
+        }
       });
 
       document.getElementById("next-btn").addEventListener("click", () => {
+        if (currentStep === 2) {
+          populateStep3(
+            stepSelections["radio-group-1"],
+            stepSelections["radio-group-2"]
+          );
+        }
         if (currentStep < 4) {
           currentStep++;
           if (currentStep === 4) {
             updateDropdownsFromSelections();
             displayCards();
-            document.querySelector(".navigation").style.display = "none";
+            // document.querySelector(".navigation").style.display = "none";
           }
           showStep(currentStep);
         }

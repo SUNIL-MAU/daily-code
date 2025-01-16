@@ -1440,7 +1440,7 @@ const data = [
     cards: [
       {
         Heading: "Guidance",
-        "Body text": "Read more about One Drive and how you can use it ",
+        "Body text": "Read more about One Drive and how you can use it",
         Links: [
           {
             link: "https://hsbcitid.service-now.com/servicenow?id=kb_article&amp;sys_id=af2af6b8833782d893af81c8beaad33e",
@@ -1464,7 +1464,7 @@ const data = [
   {
     "Who is this for": "Cybersecurity audience",
     "What do you want to do?": "Collaborate on",
-    "What is it?": "Files that don’t require team-wide access ",
+    "What is it?": "Files that don’t require team-wide access",
     cards: [
       {
         Heading: "Guidance",
@@ -1492,7 +1492,8 @@ const data = [
   {
     "Who is this for": "Bank internal audience",
     "What do you want to do?": "Collaborate on",
-    "What is it?": "My team’s documents and internal sites management ",
+    "What is it?": "My team’s documents and internal sites management",
+
     cards: [
       {
         Heading: "Guidance",
@@ -2527,7 +2528,7 @@ const data = [
   {
     "Who is this for": "Bank internal audience",
     "What do you want to do?": "Share",
-    "What is it?": "Various files using Microsoft 365 ",
+    "What is it?": "Various files using Microsoft 365",
     cards: [
       {
         Heading: "Guidance",
