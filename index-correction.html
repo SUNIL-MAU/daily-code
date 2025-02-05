@@ -135,6 +135,10 @@
 
       let currentStep = 1;
       let stepSelections = {};
+      const dropdown1 = document.getElementById("dropdown1");
+      const dropdown2 = document.getElementById("dropdown2");
+      const dropdown3 = document.getElementById("dropdown3");
+      const cardsContainer = document.getElementById("cards-container");
 
       // Utility to populate radio buttons
       function populateRadioButtons(containerId, options) {
@@ -174,6 +178,20 @@
           dropdown.appendChild(opt);
         });
       }
+
+      dropdown1.addEventListener("change", (e) => {
+        if (dropdown1.value === "External") {
+          dropdown2.disabled === true;
+          dropdown3.disabled === true;
+          dropdown2.style.cursor === "not-allowed";
+          dropdown3.style.cursor === "not-allowed";
+        } else {
+          dropdown2.disabled === false;
+          dropdown3.disabled === false;
+          dropdown2.style.cursor === "not-allowed";
+          dropdown3.style.cursor === "not-allowed";
+        }
+      });
 
       // Utility to display the correct step
       function showStep(step) {
@@ -312,11 +330,6 @@
         document.getElementById("next-btn").disabled = true;
       }
 
-      const dropdown1 = document.getElementById("dropdown1");
-      const dropdown2 = document.getElementById("dropdown2");
-      const dropdown3 = document.getElementById("dropdown3");
-      const cardsContainer = document.getElementById("cards-container");
-
       populateDropdown(dropdown1, options1, null);
       populateDropdown(dropdown2, options2, null);
 
@@ -390,27 +403,6 @@
         );
         const selected3 = document.querySelector(
           'input[name="radio-group-3"]:checked'
-        );
-
-        console.log("selected3", selected3);
-        console.log(
-          "dropdown1.value",
-          dropdown1.value,
-          "selected1.value",
-          selected1.value
-        );
-        console.log(
-          "dropdown2.value",
-          dropdown2.value,
-          "selected2.value",
-          selected2.value
-        );
-
-        console.log(
-          "dropdown3.value",
-          dropdown3.value,
-          "selected3.value",
-          selected3.value
         );
 
         if (selected1) dropdown1.value = selected1.value;
