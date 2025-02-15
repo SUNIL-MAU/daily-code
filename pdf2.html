@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF Viewer with Smooth Zoom & Drag</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f4f4f4;
+        overflow: hidden;
+      }
+      .pdf-container {
+        position: relative;
+        width: 80%;
+        height: 80%;
+        overflow: hidden;
+        border: 1px solid #ddd;
+        background: white;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+      }
+      #pdfCanvas {
+        cursor: grab;
+        transition: transform 0.3s ease-out;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="pdf-container" id="pdfContainer">
+      <canvas id="pdfCanvas"></canvas>
+    </div>
+
+    <script>
+      let pdfDoc = null;
+      let currentPage = 1;
+      let scale = 1; // Default zoom
+      let minScale = 0.2,
+        maxScale = 1.5;
+      let offsetX = 0,
+        offsetY = 0;
+      let dragging = false,
+        startX,
+        startY;
+      const canvas = document.getElementById("pdfCanvas");
+      const ctx = canvas.getContext("2d");
+      const pdfContainer = document.getElementById("pdfContainer");
+
+      const url = "shivanand.pdf"; // Your PDF file
+
+      // Load PDF
+      pdfjsLib.getDocument(url).promise.then((pdf) => {
+        pdfDoc = pdf;
+        renderPage(currentPage);
+      });
+      function renderPage(pageNumber) {
+        pdfDoc.getPage(pageNumber).then((page) => {
+          const viewport = page.getViewport({ scale: scale });
+
+          // Set canvas dimensions
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+
+          // Render the PDF page
+          const renderContext = { canvasContext: ctx, viewport: viewport };
+          page.render(renderContext);
+
+          // **Center the PDF initially & maintain it during zooming**
+          offsetX = (pdfContainer.clientWidth - canvas.width) / 2;
+          offsetY = (pdfContainer.clientHeight - canvas.height) / 2;
+
+          canvas.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+        });
+      }
+
+      // **Smooth Zooming on Mouse Scroll**
+      pdfContainer.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        let zoomFactor = 1.05; // Smaller factor for gradual zoom
+        let rect = canvas.getBoundingClientRect();
+        let mouseX = e.clientX - rect.left;
+        let mouseY = e.clientY - rect.top;
+
+        // Zoom in or out
+        if (e.deltaY < 0 && scale < maxScale) {
+          scale *= zoomFactor;
+          offsetX = (offsetX - mouseX) * zoomFactor + mouseX;
+          offsetY = (offsetY - mouseY) * zoomFactor + mouseY;
+        } else if (e.deltaY > 0 && scale > minScale) {
+          scale /= zoomFactor;
+          offsetX = (offsetX - mouseX) / zoomFactor + mouseX;
+          offsetY = (offsetY - mouseY) / zoomFactor + mouseY;
+        }
+
+        renderPage(currentPage);
+      });
+
+      // **Tap to Zoom In**
+      pdfContainer.addEventListener("click", (e) => {
+        if (scale < maxScale) {
+          let rect = canvas.getBoundingClientRect();
+          let clickX = e.clientX - rect.left;
+          let clickY = e.clientY - rect.top;
+
+          scale *= 1.2; // Slight zoom increase
+          offsetX = (offsetX - clickX) * 1.2 + clickX;
+          offsetY = (offsetY - clickY) * 1.2 + clickY;
+
+          renderPage(currentPage);
+        }
+      });
+
+      // **Dragging (Panning)**
+      canvas.addEventListener("mousedown", (e) => {
+        dragging = true;
+        startX = e.clientX - offsetX;
+        startY = e.clientY - offsetY;
+        canvas.style.cursor = "grabbing";
+      });
+
+      canvas.addEventListener("mousemove", (e) => {
+        if (!dragging) return;
+        offsetX = e.clientX - startX;
+        offsetY = e.clientY - startY;
+        canvas.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+      });
+
+      canvas.addEventListener("mouseup", () => {
+        dragging = false;
+        canvas.style.cursor = "grab";
+      });
+
+      canvas.addEventListener("mouseleave", () => {
+        dragging = false;
+        canvas.style.cursor = "grab";
+      });
+
+      // **Pinch-to-Zoom for Mobile**
+      let touchStartDistance = 0;
+      pdfContainer.addEventListener("touchstart", (e) => {
+        if (e.touches.length === 2) {
+          touchStartDistance = getDistance(e.touches[0], e.touches[1]);
+        }
+      });
+
+      pdfContainer.addEventListener("touchmove", (e) => {
+        if (e.touches.length === 2) {
+          e.preventDefault();
+          let touchEndDistance = getDistance(e.touches[0], e.touches[1]);
+          let zoomFactor = 1.02;
+
+          if (touchEndDistance > touchStartDistance && scale < maxScale) {
+            scale *= zoomFactor;
+          } else if (
+            touchEndDistance < touchStartDistance &&
+            scale > minScale
+          ) {
+            scale /= zoomFactor;
+          }
+
+          touchStartDistance = touchEndDistance;
+          renderPage(currentPage);
+        }
+      });
+
+      function getDistance(touch1, touch2) {
+        return Math.sqrt(
+          Math.pow(touch2.clientX - touch1.clientX, 2) +
+            Math.pow(touch2.clientY - touch1.clientY, 2)
+        );
+      }
+
+      document.addEventListener("click", (e) => {
+        if (!pdfContainer.contains(e.target)) {
+          // Reset zoom and position when clicking outside
+          scale = 1;
+          offsetX = (pdfContainer.clientWidth - canvas.width) / 2;
+          offsetY = (pdfContainer.clientHeight - canvas.height) / 2;
+
+          canvas.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+          renderPage(currentPage);
+        }
+      });
+    </script>
+  </body>
+</html>

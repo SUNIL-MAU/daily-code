@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vanilla JS Accordion</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+        background-color: #f4f4f4;
+        padding-top: 20px;
+      }
+
+      .controls {
+        margin-bottom: 15px;
+      }
+
+      .accordion {
+        width: 400px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .accordion-item {
+        border-bottom: 1px solid #ddd;
+      }
+
+      .accordion-header {
+        width: 100%;
+        padding: 15px;
+        font-size: 18px;
+        text-align: left;
+        background: #f8f9fa;
+        border: none;
+        cursor: pointer;
+        outline: none;
+        transition: background 0.3s ease;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .accordion-header:hover {
+        background: #e9ecef;
+      }
+
+      .accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        padding: 0 15px;
+        background: white;
+        transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+      }
+
+      .accordion-content p {
+        margin: 0;
+      }
+
+      .accordion-item.active .accordion-content {
+        padding: 15px;
+      }
+
+      .indicator {
+        transition: transform 0.3s ease;
+      }
+
+      .accordion-item.active .indicator {
+        transform: rotate(180deg);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="controls">
+      <button id="expandAll">Expand All</button>
+      <button id="collapseAll">Collapse All</button>
+    </div>
+
+    <div class="accordion">
+      <div class="accordion-item">
+        <button class="accordion-header">
+          Section 1 <span class="indicator">▼</span>
+        </button>
+        <div class="accordion-content">
+          <p>This is content for section 1.</p>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-header">
+          Section 2 <span class="indicator">▼</span>
+        </button>
+        <div class="accordion-content">
+          <p>This is content for section 2.</p>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-header">
+          Section 3 <span class="indicator">▼</span>
+        </button>
+        <div class="accordion-content">
+          <p>This is content for section 3.</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const headers = document.querySelectorAll(".accordion-header");
+        const expandAllBtn = document.getElementById("expandAll");
+        const collapseAllBtn = document.getElementById("collapseAll");
+        const items = document.querySelectorAll(".accordion-item");
+
+        headers.forEach((header) => {
+          header.addEventListener("click", function () {
+            const item = this.parentElement;
+            const content = this.nextElementSibling;
+            const indicator = this.querySelector(".indicator");
+            const isActive = item.classList.contains("active");
+
+            if (isActive) {
+              item.classList.remove("active");
+              content.style.maxHeight = "0";
+              content.style.padding = "0 15px";
+            } else {
+              item.classList.add("active");
+              content.style.maxHeight = content.scrollHeight + "px";
+              content.style.padding = "15px";
+            }
+          });
+        });
+
+        expandAllBtn.addEventListener("click", () => {
+          items.forEach((item) => {
+            const content = item.querySelector(".accordion-content");
+            item.classList.add("active");
+            content.style.maxHeight = content.scrollHeight + "px";
+            content.style.padding = "15px";
+          });
+        });
+
+        collapseAllBtn.addEventListener("click", () => {
+          items.forEach((item) => {
+            const content = item.querySelector(".accordion-content");
+            item.classList.remove("active");
+            content.style.maxHeight = "0";
+            content.style.padding = "0 15px";
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
