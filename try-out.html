@@ -126,7 +126,7 @@
         const searchInput = document.getElementById("searchInput");
         const noResultsMessage = document.getElementById("noResults");
 
-        // Generate accordion items
+        // Render accordion items based on data
         function renderAccordion(data) {
           container.innerHTML = "";
           if (data.length === 0) {
@@ -149,14 +149,13 @@
               `;
               container.appendChild(itemDiv);
             });
-
             attachAccordionEvents();
           }
         }
 
         renderAccordion(matrixData);
 
-        // Accordion toggle events
+        // Attach toggle event to each accordion header
         function attachAccordionEvents() {
           const headers = document.querySelectorAll(".accordion-header");
           headers.forEach((header) => {
@@ -198,7 +197,7 @@
           isExpanded = !isExpanded;
         });
 
-        // Real-time search
+        // Real-time search filtering
         searchInput.addEventListener("input", function () {
           const query = this.value.toLowerCase();
           const filteredData = matrixData.filter((item) => {
