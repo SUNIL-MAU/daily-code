@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vanilla JS Accordion</title>
+    <title>Vanilla JS Accordion with Search</title>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -16,7 +16,17 @@
       }
 
       .controls {
+        display: flex;
+        gap: 10px;
         margin-bottom: 15px;
+      }
+
+      input {
+        padding: 8px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: 250px;
       }
 
       .accordion {
@@ -39,7 +49,6 @@
         border: none;
         cursor: pointer;
         outline: none;
-        transition: background 0.3s ease;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -61,94 +70,142 @@
         margin: 0;
       }
 
-      .accordion-item.active .accordion-content {
-        padding: 15px;
-      }
-
-      .indicator {
-        transition: transform 0.3s ease;
-      }
-
-      .accordion-item.active .indicator {
-        transform: rotate(180deg);
+      .no-results {
+        text-align: center;
+        font-size: 18px;
+        color: #777;
+        padding: 20px;
       }
     </style>
   </head>
   <body>
     <div class="controls">
-      <button id="expandAll">Expand All</button>
-      <button id="collapseAll">Collapse All</button>
+      <input type="text" id="searchInput" placeholder="Search..." />
+      <button id="toggleAll">Expand All</button>
     </div>
 
-    <div class="accordion">
-      <div class="accordion-item">
-        <button class="accordion-header">
-          Section 1 <span class="indicator">▼</span>
-        </button>
-        <div class="accordion-content">
-          <p>This is content for section 1.</p>
-        </div>
-      </div>
-      <div class="accordion-item">
-        <button class="accordion-header">
-          Section 2 <span class="indicator">▼</span>
-        </button>
-        <div class="accordion-content">
-          <p>This is content for section 2.</p>
-        </div>
-      </div>
-      <div class="accordion-item">
-        <button class="accordion-header">
-          Section 3 <span class="indicator">▼</span>
-        </button>
-        <div class="accordion-content">
-          <p>This is content for section 3.</p>
-        </div>
-      </div>
-    </div>
+    <div class="accordion"></div>
+    <p id="noResults" class="no-results" style="display: none">
+      No results found 😞 Try a different keyword!
+    </p>
 
     <script>
+      const matrixData = [
+        {
+          title: "HSBC Central Workplace Directory",
+          channel: "x",
+          link: {
+            text: "Cybersecurity (SharePoint)",
+            hyperlink:
+              "https://www.istockphoto.com/photo/bridge-over-sea-against-clear-sky-during-sunset-gm2169699402-589672056",
+          },
+          audience: "ALL HSBC",
+          type: "General HSBC org. Design information + directory",
+        },
+        {
+          title: "Cyber Central",
+          channel: "Subpages per topic",
+          link: {
+            text: "Cyber Central Guide",
+            hyperlink: "https://social.global.hsbc/cybertechnology/hor",
+          },
+          audience: "ALL HSBC",
+          type: "Cybersecurity awareness guidance and resources",
+        },
+      ];
+
       document.addEventListener("DOMContentLoaded", () => {
-        const headers = document.querySelectorAll(".accordion-header");
-        const expandAllBtn = document.getElementById("expandAll");
-        const collapseAllBtn = document.getElementById("collapseAll");
-        const items = document.querySelectorAll(".accordion-item");
+        const container = document.querySelector(".accordion");
+        const toggleAllBtn = document.getElementById("toggleAll");
+        const searchInput = document.getElementById("searchInput");
+        const noResultsMessage = document.getElementById("noResults");
 
-        headers.forEach((header) => {
-          header.addEventListener("click", function () {
-            const item = this.parentElement;
-            const content = this.nextElementSibling;
-            const indicator = this.querySelector(".indicator");
-            const isActive = item.classList.contains("active");
+        // Generate accordion items
+        function renderAccordion(data) {
+          container.innerHTML = "";
+          if (data.length === 0) {
+            noResultsMessage.style.display = "block";
+          } else {
+            noResultsMessage.style.display = "none";
+            data.forEach((item) => {
+              const itemDiv = document.createElement("div");
+              itemDiv.classList.add("accordion-item");
+              itemDiv.innerHTML = `
+                <button class="accordion-header">
+                    ${item.title}
+                    <span class="indicator">▼</span>
+                </button>
+                <div class="accordion-content">
+                    <p><strong>Link:</strong> <a href="${item.link.hyperlink}" target="_blank">${item.link.text}</a></p>
+                    <p><strong>Audience:</strong> ${item.audience}</p>
+                    <p><strong>Type:</strong> ${item.type}</p>
+                </div>
+              `;
+              container.appendChild(itemDiv);
+            });
 
-            if (isActive) {
-              item.classList.remove("active");
-              content.style.maxHeight = "0";
-              content.style.padding = "0 15px";
-            } else {
+            attachAccordionEvents();
+          }
+        }
+
+        renderAccordion(matrixData);
+
+        // Accordion toggle events
+        function attachAccordionEvents() {
+          const headers = document.querySelectorAll(".accordion-header");
+          headers.forEach((header) => {
+            header.addEventListener("click", function () {
+              const item = this.parentElement;
+              const content = this.nextElementSibling;
+              const isActive = item.classList.contains("active");
+
+              if (isActive) {
+                item.classList.remove("active");
+                content.style.maxHeight = "0";
+              } else {
+                item.classList.add("active");
+                content.style.maxHeight = content.scrollHeight + "px";
+              }
+            });
+          });
+        }
+
+        let isExpanded = false;
+        toggleAllBtn.addEventListener("click", () => {
+          const items = document.querySelectorAll(".accordion-item");
+
+          if (!isExpanded) {
+            items.forEach((item) => {
+              const content = item.querySelector(".accordion-content");
               item.classList.add("active");
               content.style.maxHeight = content.scrollHeight + "px";
-              content.style.padding = "15px";
-            }
-          });
+            });
+            toggleAllBtn.textContent = "Collapse All";
+          } else {
+            items.forEach((item) => {
+              const content = item.querySelector(".accordion-content");
+              item.classList.remove("active");
+              content.style.maxHeight = "0";
+            });
+            toggleAllBtn.textContent = "Expand All";
+          }
+          isExpanded = !isExpanded;
         });
 
-        expandAllBtn.addEventListener("click", () => {
-          items.forEach((item) => {
-            const content = item.querySelector(".accordion-content");
-            item.classList.add("active");
-            content.style.maxHeight = content.scrollHeight + "px";
-            content.style.padding = "15px";
+        // Real-time search
+        searchInput.addEventListener("input", function () {
+          const query = this.value.toLowerCase();
+          const filteredData = matrixData.filter((item) => {
+            return (
+              item.title.toLowerCase().includes(query) ||
+              item.channel.toLowerCase().includes(query) ||
+              item.audience.toLowerCase().includes(query) ||
+              item.type.toLowerCase().includes(query) ||
+              item.link.text.toLowerCase().includes(query)
+            );
           });
-        });
 
-        collapseAllBtn.addEventListener("click", () => {
-          items.forEach((item) => {
-            const content = item.querySelector(".accordion-content");
-            item.classList.remove("active");
-            content.style.maxHeight = "0";
-            content.style.padding = "0 15px";
-          });
+          renderAccordion(filteredData);
         });
       });
     </script>
