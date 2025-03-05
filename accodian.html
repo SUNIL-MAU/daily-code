@@ -3,153 +3,110 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vanilla JS Accordion</title>
+    <title>Dynamic Accordion</title>
     <style>
       body {
         font-family: Arial, sans-serif;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        height: 100vh;
-        background-color: #f4f4f4;
-        padding-top: 20px;
+        padding: 20px;
       }
-
-      .controls {
-        margin-bottom: 15px;
+      .search-box {
+        margin-bottom: 10px;
       }
-
       .accordion {
-        width: 400px;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        border: 1px solid #ddd;
+        border-radius: 5px;
       }
-
       .accordion-item {
         border-bottom: 1px solid #ddd;
       }
-
       .accordion-header {
-        width: 100%;
-        padding: 15px;
-        font-size: 18px;
-        text-align: left;
-        background: #f8f9fa;
-        border: none;
+        background: #f4f4f4;
+        padding: 10px;
         cursor: pointer;
-        outline: none;
-        transition: background 0.3s ease;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
       }
-
-      .accordion-header:hover {
-        background: #e9ecef;
-      }
-
       .accordion-content {
-        max-height: 0;
-        overflow: hidden;
-        padding: 0 15px;
-        background: white;
-        transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+        display: none;
+        padding: 10px;
       }
-
-      .accordion-content p {
-        margin: 0;
-      }
-
-      .accordion-item.active .accordion-content {
-        padding: 15px;
-      }
-
-      .indicator {
-        transition: transform 0.3s ease;
-      }
-
-      .accordion-item.active .indicator {
-        transform: rotate(180deg);
+      .toggle-btn {
+        margin: 10px 0;
+        padding: 5px 10px;
+        cursor: pointer;
       }
     </style>
   </head>
   <body>
-    <div class="controls">
-      <button id="expandAll">Expand All</button>
-      <button id="collapseAll">Collapse All</button>
-    </div>
-
-    <div class="accordion">
-      <div class="accordion-item">
-        <button class="accordion-header">
-          Section 1 <span class="indicator">▼</span>
-        </button>
-        <div class="accordion-content">
-          <p>This is content for section 1.</p>
-        </div>
-      </div>
-      <div class="accordion-item">
-        <button class="accordion-header">
-          Section 2 <span class="indicator">▼</span>
-        </button>
-        <div class="accordion-content">
-          <p>This is content for section 2.</p>
-        </div>
-      </div>
-      <div class="accordion-item">
-        <button class="accordion-header">
-          Section 3 <span class="indicator">▼</span>
-        </button>
-        <div class="accordion-content">
-          <p>This is content for section 3.</p>
-        </div>
-      </div>
-    </div>
+    <input type="text" id="search" class="search-box" placeholder="Search..." />
+    <button id="toggleAll" class="toggle-btn">Expand All</button>
+    <div id="accordionContainer" class="accordion"></div>
 
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const headers = document.querySelectorAll(".accordion-header");
-        const expandAllBtn = document.getElementById("expandAll");
-        const collapseAllBtn = document.getElementById("collapseAll");
-        const items = document.querySelectorAll(".accordion-item");
+      document.addEventListener("DOMContentLoaded", function () {
+        const data = [
+          {
+            channel: "HSBC Central Workplace Directory",
+            link: "Cybersecurity (sharepoint.com)",
+            audience: "ALL HSBC",
+            type: "General HSBC org. Design information + directory",
+          },
+          {
+            channel: "Cyber Central",
+            link: "https://social.global.hsbc/cybertechnology/hor",
+            audience: "ALL HSBC",
+            type: "Provide seamless access to cybersecurity awareness",
+          },
+        ];
 
-        headers.forEach((header) => {
-          header.addEventListener("click", function () {
-            const item = this.parentElement;
-            const content = this.nextElementSibling;
-            const indicator = this.querySelector(".indicator");
-            const isActive = item.classList.contains("active");
+        const container = document.getElementById("accordionContainer");
+        const searchBox = document.getElementById("search");
+        const toggleAllBtn = document.getElementById("toggleAll");
+        let expanded = false;
 
-            if (isActive) {
-              item.classList.remove("active");
-              content.style.maxHeight = "0";
-              content.style.padding = "0 15px";
-            } else {
-              item.classList.add("active");
-              content.style.maxHeight = content.scrollHeight + "px";
-              content.style.padding = "15px";
-            }
+        function renderAccordion(filteredData) {
+          container.innerHTML = "";
+          filteredData.forEach((item, index) => {
+            const itemDiv = document.createElement("div");
+            itemDiv.classList.add("accordion-item");
+            itemDiv.innerHTML = `
+                        <div class="accordion-header" onclick="toggleAccordion(${index})">${item.channel}</div>
+                        <div class="accordion-content" id="content-${index}">
+                            <p><strong>Link:</strong> <a href="${item.link}" target="_blank">${item.link}</a></p>
+                            <p><strong>Audience:</strong> ${item.audience}</p>
+                            <p><strong>Type:</strong> ${item.type}</p>
+                        </div>
+                    `;
+            container.appendChild(itemDiv);
           });
+        }
+
+        window.toggleAccordion = function (index) {
+          const content = document.getElementById(`content-${index}`);
+          content.style.display =
+            content.style.display === "block" ? "none" : "block";
+        };
+
+        searchBox.addEventListener("input", function () {
+          const searchTerm = searchBox.value.toLowerCase();
+          const filtered = data.filter(
+            (item) =>
+              item.channel.toLowerCase().includes(searchTerm) ||
+              item.link.toLowerCase().includes(searchTerm) ||
+              item.audience.toLowerCase().includes(searchTerm) ||
+              item.type.toLowerCase().includes(searchTerm)
+          );
+          renderAccordion(filtered);
         });
 
-        expandAllBtn.addEventListener("click", () => {
-          items.forEach((item) => {
-            const content = item.querySelector(".accordion-content");
-            item.classList.add("active");
-            content.style.maxHeight = content.scrollHeight + "px";
-            content.style.padding = "15px";
+        toggleAllBtn.addEventListener("click", function () {
+          expanded = !expanded;
+          document.querySelectorAll(".accordion-content").forEach((content) => {
+            content.style.display = expanded ? "block" : "none";
           });
+          toggleAllBtn.textContent = expanded ? "Collapse All" : "Expand All";
         });
 
-        collapseAllBtn.addEventListener("click", () => {
-          items.forEach((item) => {
-            const content = item.querySelector(".accordion-content");
-            item.classList.remove("active");
-            content.style.maxHeight = "0";
-            content.style.padding = "0 15px";
-          });
-        });
+        renderAccordion(data);
       });
     </script>
   </body>

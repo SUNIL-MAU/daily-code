@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Filters with Uint8Array</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+      canvas {
+        margin-top: 20px;
+        border: 1px solid #ddd;
+      }
+      button {
+        margin: 5px;
+        padding: 10px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Upload an Image & Apply Filters</h2>
+    <input type="file" id="upload" accept="image/*" />
+    <br />
+    <button onclick="applyFilter('grayscale')">Grayscale</button>
+    <button onclick="applyFilter('invert')">Invert</button>
+    <button onclick="applyFilter('sepia')">Sepia</button>
+    <button onclick="applyFilter('blur')">Blur</button>
+    <canvas id="canvas"></canvas>
+    <script>
+      let canvas = document.getElementById("canvas");
+      let ctx = canvas.getContext("2d");
+      let originalImageData = null; // Store original image data for reset
+
+      document
+        .getElementById("upload")
+        .addEventListener("change", function (event) {
+          let file = event.target.files[0];
+          if (!file) return;
+
+          let reader = new FileReader();
+          reader.onload = function (e) {
+            let img = new Image();
+            img.src = e.target.result;
+
+            img.onload = function () {
+              canvas.width = img.width;
+              canvas.height = img.height;
+              ctx.drawImage(img, 0, 0);
+              originalImageData = ctx.getImageData(0, 0, img.width, img.height); // Store original
+            };
+          };
+
+          reader.readAsDataURL(file);
+        });
+
+      function applyFilter(filterType) {
+        if (!originalImageData) return;
+
+        let imageData = new ImageData(
+          new Uint8ClampedArray(originalImageData.data),
+          originalImageData.width,
+          originalImageData.height
+        );
+
+        let data = imageData.data;
+        let uint8Array = new Uint8Array(data.buffer);
+
+        for (let i = 0; i < uint8Array.length; i += 4) {
+          let r = uint8Array[i]; // Red
+          let g = uint8Array[i + 1]; // Green
+          let b = uint8Array[i + 2]; // Blue
+
+          if (filterType === "grayscale") {
+            let gray = 0.3 * r + 0.59 * g + 0.11 * b;
+            uint8Array[i] = uint8Array[i + 1] = uint8Array[i + 2] = gray;
+          } else if (filterType === "invert") {
+            uint8Array[i] = 255 - r;
+            uint8Array[i + 1] = 255 - g;
+            uint8Array[i + 2] = 255 - b;
+          } else if (filterType === "sepia") {
+            uint8Array[i] = Math.min(255, 0.393 * r + 0.769 * g + 0.189 * b);
+            uint8Array[i + 1] = Math.min(
+              255,
+              0.349 * r + 0.686 * g + 0.168 * b
+            );
+            uint8Array[i + 2] = Math.min(
+              255,
+              0.272 * r + 0.534 * g + 0.131 * b
+            );
+          }
+        }
+
+        if (filterType === "blur") {
+          imageData = applyBlur(imageData);
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+      }
+
+      // Apply a simple blur effect using an averaging kernel
+      function applyBlur(imageData) {
+        let data = imageData.data;
+        let width = imageData.width;
+        let height = imageData.height;
+        let uint8Array = new Uint8Array(data.buffer);
+
+        let blurredData = new Uint8Array(uint8Array.length);
+
+        for (let y = 1; y < height - 1; y++) {
+          for (let x = 1; x < width - 1; x++) {
+            let i = (y * width + x) * 4;
+
+            let sumR = 0,
+              sumG = 0,
+              sumB = 0;
+            let count = 0;
+
+            // Simple 3x3 blur kernel
+            for (let dy = -1; dy <= 1; dy++) {
+              for (let dx = -1; dx <= 1; dx++) {
+                let ni = ((y + dy) * width + (x + dx)) * 4;
+                sumR += uint8Array[ni];
+                sumG += uint8Array[ni + 1];
+                sumB += uint8Array[ni + 2];
+                count++;
+              }
+            }
+
+            blurredData[i] = sumR / count;
+            blurredData[i + 1] = sumG / count;
+            blurredData[i + 2] = sumB / count;
+            blurredData[i + 3] = uint8Array[i + 3]; // Preserve alpha
+          }
+        }
+
+        return new ImageData(new Uint8ClampedArray(blurredData), width, height);
+      }
+    </script>
+  </body>
+</html>
