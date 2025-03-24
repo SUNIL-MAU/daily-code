@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vertical Tabs with Animation</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        display: flex;
+        width: 800px;
+        background: #fff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+      }
+
+      /* Tabs Section */
+      .tabs {
+        width: 250px;
+        display: flex;
+        flex-direction: column;
+        border-right: 2px solid #ddd;
+      }
+
+      .tab-btn {
+        padding: 15px;
+        text-align: left;
+        background: none;
+        border: none;
+        width: 100%;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease-in-out,
+          border-left 0.3s ease-in-out;
+      }
+
+      .tab-btn:hover {
+        background: #e0e0e0;
+      }
+
+      .tab-btn.active {
+        background: #e0e0e0;
+        color: red;
+        border-left: 3px solid red;
+        font-weight: bold;
+      }
+
+      .tab-btn.active:hover {
+        background: #e0e0e0;
+      }
+
+      /* Content Section */
+      .tab-content {
+        flex: 1;
+        padding: 20px;
+      }
+
+      /* Animation for tab content */
+      .tab-panel {
+        display: none;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+      }
+
+      .tab-panel.active {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+        animation: fadeInUp 0.4s ease-in-out;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(15px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .feedback-btn {
+        background: red;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 15px;
+      }
+
+      .feedback-btn:hover {
+        background: darkred;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Vertical Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'issue')">
+          Share your issue or idea
+        </button>
+        <button class="tab-btn" onclick="openTab(event, 'analyse')">
+          We analyse the feedback
+        </button>
+        <button class="tab-btn" onclick="openTab(event, 'act')">
+          We act upon the feedback
+        </button>
+        <button class="tab-btn" onclick="openTab(event, 'solutions')">
+          We help bring solutions to life
+        </button>
+        <button class="tab-btn" onclick="openTab(event, 'updates')">
+          You get updates
+        </button>
+      </div>
+
+      <!-- Content -->
+      <div class="tab-content">
+        <div id="issue" class="tab-panel active">
+          <h2>Share your issue or idea for improvement</h2>
+          <p>
+            Every day, you use different tools and systems designed to support
+            your work.
+          </p>
+          <button class="feedback-btn">Share feedback</button>
+        </div>
+        <div id="analyse" class="tab-panel">
+          <h2>We analyse the feedback</h2>
+          <p>
+            We carefully examine the feedback to identify key areas of
+            improvement.
+          </p>
+        </div>
+        <div id="act" class="tab-panel">
+          <h2>We act upon the feedback</h2>
+          <p>
+            Your feedback helps us implement necessary changes for a better
+            experience.
+          </p>
+        </div>
+        <div id="solutions" class="tab-panel">
+          <h2>We help bring solutions to life</h2>
+          <p>
+            Based on feedback, we design and develop solutions that enhance
+            productivity.
+          </p>
+        </div>
+        <div id="updates" class="tab-panel">
+          <h2>You get updates</h2>
+          <p>
+            Stay informed about the latest improvements based on your valuable
+            feedback.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function openTab(event, tabId) {
+        let tabs = document.querySelectorAll(".tab-btn");
+        let panels = document.querySelectorAll(".tab-panel");
+
+        tabs.forEach((tab) => tab.classList.remove("active"));
+        panels.forEach((panel) => {
+          panel.classList.remove("active");
+          panel.style.animation = "none";
+        });
+
+        let panel = document.getElementById(tabId);
+        event.currentTarget.classList.add("active");
+
+        setTimeout(() => {
+          panel.style.animation = "fadeInUp 0.4s ease-in-out";
+          panel.classList.add("active");
+        }, 10);
+      }
+    </script>
+  </body>
+</html>
