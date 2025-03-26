@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Smooth Custom Carousel</title>
+    <style>
+      .carousel-container {
+        position: relative;
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        overflow: hidden;
+      }
+
+      .carousel-slides-wrapper {
+        overflow: hidden;
+      }
+
+      .carousel-slides {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+      }
+
+      .carousel-slide {
+        min-width: 100%;
+        height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f0f0f0;
+      }
+
+      .carousel-slide img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: cover;
+      }
+
+      .carousel-controls {
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        transform: translateY(-50%);
+      }
+
+      .carousel-control {
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        user-select: none;
+        z-index: 10;
+      }
+
+      .carousel-indicators {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+      }
+
+      .indicator {
+        width: 10px;
+        height: 10px;
+        background-color: #ccc;
+        border-radius: 50%;
+        margin: 0 5px;
+        cursor: pointer;
+      }
+
+      .indicator.active {
+        background-color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="carousel-container">
+      <div class="carousel-slides-wrapper">
+        <div class="carousel-slides">
+          <div class="carousel-slide">
+            <img src="/api/placeholder/800/400?text=Slide+1" alt="Slide 1" />
+          </div>
+          <div class="carousel-slide">
+            <img src="/api/placeholder/800/400?text=Slide+2" alt="Slide 2" />
+          </div>
+          <div class="carousel-slide">
+            <img src="/api/placeholder/800/400?text=Slide+3" alt="Slide 3" />
+          </div>
+        </div>
+      </div>
+
+      <div class="carousel-controls">
+        <button class="carousel-control prev-slide">&lt;</button>
+        <button class="carousel-control next-slide">&gt;</button>
+      </div>
+
+      <div class="carousel-indicators">
+        <div class="indicator active" data-slide="0"></div>
+        <div class="indicator" data-slide="1"></div>
+        <div class="indicator" data-slide="2"></div>
+      </div>
+    </div>
+
+    <script>
+      class Carousel {
+        constructor(container) {
+          this.container = container;
+          this.slidesWrapper = container.querySelector(
+            ".carousel-slides-wrapper"
+          );
+          this.slides = container.querySelector(".carousel-slides");
+          this.slideElements = container.querySelectorAll(".carousel-slide");
+          this.prevButton = container.querySelector(".prev-slide");
+          this.nextButton = container.querySelector(".next-slide");
+          this.indicators = container.querySelectorAll(".indicator");
+
+          this.currentSlide = 0;
+          this.totalSlides = this.slideElements.length;
+          this.isTransitioning = false;
+
+          // Create clones for smooth infinite scrolling
+          this.createClones();
+
+          this.initEventListeners();
+        }
+
+        createClones() {
+          const firstClone = this.slideElements[0].cloneNode(true);
+          const lastClone =
+            this.slideElements[this.totalSlides - 1].cloneNode(true);
+
+          firstClone.classList.add("clone");
+          lastClone.classList.add("clone");
+
+          this.slides.appendChild(firstClone);
+          this.slides.insertBefore(lastClone, this.slides.firstChild);
+
+          // Update slides reference after cloning
+          this.slideElements =
+            this.container.querySelectorAll(".carousel-slide");
+        }
+
+        initEventListeners() {
+          this.nextButton.addEventListener("click", () => this.nextSlide());
+          this.prevButton.addEventListener("click", () => this.prevSlide());
+
+          this.indicators.forEach((indicator, index) => {
+            indicator.addEventListener("click", () => this.goToSlide(index));
+          });
+
+          this.slides.addEventListener("transitionend", () => {
+            this.checkForSlideReset();
+          });
+        }
+
+        nextSlide() {
+          if (this.isTransitioning) return;
+
+          this.isTransitioning = true;
+          this.currentSlide++;
+          this.updateCarousel(true);
+        }
+
+        prevSlide() {
+          if (this.isTransitioning) return;
+
+          this.isTransitioning = true;
+          this.currentSlide--;
+          this.updateCarousel(true);
+        }
+
+        goToSlide(slideIndex) {
+          if (this.isTransitioning) return;
+
+          this.isTransitioning = true;
+          this.currentSlide = slideIndex;
+          this.updateCarousel(true);
+        }
+
+        checkForSlideReset() {
+          // Handle infinite scrolling
+          if (this.currentSlide >= this.totalSlides) {
+            this.slides.style.transition = "none";
+            this.currentSlide = 0;
+            this.updateCarousel(false);
+          } else if (this.currentSlide < 0) {
+            this.slides.style.transition = "none";
+            this.currentSlide = this.totalSlides - 1;
+            this.updateCarousel(false);
+          }
+
+          this.isTransitioning = false;
+        }
+
+        updateCarousel(shouldAnimate = true) {
+          // Set transition based on whether we want animation
+          this.slides.style.transition = shouldAnimate
+            ? "transform 0.5s ease-in-out"
+            : "none";
+
+          // Calculate the offset, accounting for the extra clone slides
+          const offset = (this.currentSlide + 1) * -100;
+          this.slides.style.transform = `translateX(${offset}%)`;
+
+          // Update active indicator
+          this.indicators.forEach((indicator, index) => {
+            indicator.classList.toggle(
+              "active",
+              index ===
+                (this.currentSlide >= this.totalSlides
+                  ? 0
+                  : this.currentSlide < 0
+                  ? this.totalSlides - 1
+                  : this.currentSlide)
+            );
+          });
+        }
+      }
+
+      // Initialize carousel when DOM is fully loaded
+      document.addEventListener("DOMContentLoaded", () => {
+        const carouselContainer = document.querySelector(".carousel-container");
+        new Carousel(carouselContainer);
+      });
+    </script>
+  </body>
+</html>
