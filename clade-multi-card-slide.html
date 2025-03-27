@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Multi-Card Slider</title>
+    <style>
+      .multi-card-slider-container {
+        position: relative;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        overflow: hidden;
+      }
+
+      .multi-card-slider-wrapper {
+        overflow: hidden;
+      }
+
+      .multi-card-slides {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+      }
+
+      .multi-card-slide {
+        flex: 0 0 calc(33.333% - 20px);
+        margin-right: 20px;
+        background-color: #f0f0f0;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+      }
+
+      .multi-card-slide:last-child {
+        margin-right: 0;
+      }
+
+      .multi-card-controls {
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        transform: translateY(-50%);
+      }
+
+      .multi-card-control {
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        user-select: none;
+        z-index: 10;
+      }
+
+      .multi-card-indicators {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+      }
+
+      .multi-card-indicator {
+        width: 10px;
+        height: 10px;
+        background-color: #ccc;
+        border-radius: 50%;
+        margin: 0 5px;
+        cursor: pointer;
+      }
+
+      .multi-card-indicator.active {
+        background-color: #333;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 1024px) {
+        .multi-card-slide {
+          flex: 0 0 calc(50% - 20px);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .multi-card-slide {
+          flex: 0 0 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="multi-card-slider-container">
+      <div class="multi-card-slider-wrapper">
+        <div class="multi-card-slides">
+          <div class="multi-card-slide">
+            <h3>Card 1</h3>
+          </div>
+          <div class="multi-card-slide">
+            <h3>Card 2</h3>
+          </div>
+          <div class="multi-card-slide">
+            <h3>Card 3</h3>
+          </div>
+          <div class="multi-card-slide">
+            <h3>Card 4</h3>
+          </div>
+          <div class="multi-card-slide">
+            <h3>Card 5</h3>
+          </div>
+          <div class="multi-card-slide">
+            <h3>Card 6</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="multi-card-controls">
+        <button class="multi-card-control prev-slide">&lt;</button>
+        <button class="multi-card-control next-slide">&gt;</button>
+      </div>
+
+      <div class="multi-card-indicators">
+        <div class="multi-card-indicator active" data-slide="0"></div>
+        <div class="multi-card-indicator" data-slide="1"></div>
+        <div class="multi-card-indicator" data-slide="2"></div>
+      </div>
+    </div>
+
+    <script>
+      class MultiCardSlider {
+        constructor(
+          container,
+          {
+            slidesToShow = 3,
+            slidesToScroll = 1,
+            responsive = [
+              { breakpoint: 1024, slidesToShow: 2 },
+              { breakpoint: 768, slidesToShow: 1 },
+            ],
+          } = {}
+        ) {
+          this.container = container;
+          this.slidesWrapper = container.querySelector(
+            ".multi-card-slider-wrapper"
+          );
+          this.slides = container.querySelector(".multi-card-slides");
+          this.slideElements = container.querySelectorAll(".multi-card-slide");
+          this.prevButton = container.querySelector(".prev-slide");
+          this.nextButton = container.querySelector(".next-slide");
+          this.indicators = container.querySelectorAll(".multi-card-indicator");
+
+          this.slidesToShow = slidesToShow;
+          this.slidesToScroll = slidesToScroll;
+          this.responsive = responsive;
+
+          this.currentSlide = 0;
+          this.totalSlides = this.slideElements.length;
+          this.isTransitioning = false;
+
+          this.setupResponsiveness();
+          this.createClones();
+          this.initEventListeners();
+          this.updateSliderStyle();
+        }
+
+        setupResponsiveness() {
+          // Adjust slides to show based on screen width
+          const screenWidth = window.innerWidth;
+          for (let breakpoint of this.responsive) {
+            if (screenWidth <= breakpoint.breakpoint) {
+              this.slidesToShow = breakpoint.slidesToShow;
+            }
+          }
+
+          window.addEventListener("resize", () => {
+            const newScreenWidth = window.innerWidth;
+            for (let breakpoint of this.responsive) {
+              if (newScreenWidth <= breakpoint.breakpoint) {
+                this.slidesToShow = breakpoint.slidesToShow;
+              }
+            }
+            this.updateSliderStyle();
+          });
+        }
+
+        updateSliderStyle() {
+          // Dynamically adjust slide widths based on container and slides to show
+          const containerWidth = this.container.clientWidth;
+          const gap = 20; // margin between slides
+          const slideWidth =
+            (containerWidth - gap * (this.slidesToShow - 1)) /
+            this.slidesToShow;
+
+          this.slides.querySelectorAll(".multi-card-slide").forEach((slide) => {
+            slide.style.flex = `0 0 ${slideWidth}px`;
+            slide.style.marginRight = `${gap}px`;
+          });
+          this.slides
+            .querySelectorAll(".multi-card-slide:last-child")
+            .forEach((slide) => {
+              slide.style.marginRight = "0";
+            });
+
+          // Recalculate slide position
+          this.updateCarousel(false);
+        }
+
+        createClones() {
+          // Create clones for smooth infinite scrolling
+          const clonesToPrepend = Array.from(this.slideElements)
+            .slice(-this.slidesToShow)
+            .map((slide) => slide.cloneNode(true));
+
+          const clonesToAppend = Array.from(this.slideElements)
+            .slice(0, this.slidesToShow)
+            .map((slide) => slide.cloneNode(true));
+
+          clonesToPrepend.forEach((clone) => {
+            clone.classList.add("clone");
+            this.slides.insertBefore(clone, this.slides.firstChild);
+          });
+
+          clonesToAppend.forEach((clone) => {
+            clone.classList.add("clone");
+            this.slides.appendChild(clone);
+          });
+
+          // Update slides reference after cloning
+          this.slideElements = this.container.querySelectorAll(
+            ".multi-card-slide:not(.clone)"
+          );
+        }
+
+        initEventListeners() {
+          this.nextButton.addEventListener("click", () => this.nextSlide());
+          this.prevButton.addEventListener("click", () => this.prevSlide());
+
+          this.indicators.forEach((indicator, index) => {
+            indicator.addEventListener("click", () => this.goToSlide(index));
+          });
+
+          this.slides.addEventListener("transitionend", () => {
+            this.checkForSlideReset();
+          });
+        }
+
+        nextSlide() {
+          if (this.isTransitioning) return;
+
+          this.isTransitioning = true;
+          this.currentSlide += this.slidesToScroll;
+          this.updateCarousel(true);
+        }
+
+        prevSlide() {
+          if (this.isTransitioning) return;
+
+          this.isTransitioning = true;
+          this.currentSlide -= this.slidesToScroll;
+          this.updateCarousel(true);
+        }
+
+        goToSlide(slideIndex) {
+          if (this.isTransitioning) return;
+
+          this.isTransitioning = true;
+          this.currentSlide = slideIndex * this.slidesToScroll;
+          this.updateCarousel(true);
+        }
+
+        checkForSlideReset() {
+          // Handle infinite scrolling
+          const maxSlide = this.totalSlides - this.slidesToShow;
+
+          if (this.currentSlide >= maxSlide) {
+            this.slides.style.transition = "none";
+            this.currentSlide = 0;
+            this.updateCarousel(false);
+          } else if (this.currentSlide < 0) {
+            this.slides.style.transition = "none";
+            this.currentSlide = maxSlide - this.slidesToScroll;
+            this.updateCarousel(false);
+          }
+
+          this.isTransitioning = false;
+        }
+
+        updateCarousel(shouldAnimate = true) {
+          // Set transition based on whether we want animation
+          this.slides.style.transition = shouldAnimate
+            ? "transform 0.5s ease-in-out"
+            : "none";
+
+          // Calculate the offset, accounting for the clone slides and slide width
+          const containerWidth = this.container.clientWidth;
+          const gap = 20; // margin between slides
+          const slideWidth =
+            (containerWidth - gap * (this.slidesToShow - 1)) /
+            this.slidesToShow;
+          const offset = -(
+            (this.currentSlide + this.slidesToShow) *
+            (slideWidth + gap)
+          );
+
+          this.slides.style.transform = `translateX(${offset}px)`;
+
+          // Update active indicator
+          this.indicators.forEach((indicator, index) => {
+            const activeSlide = Math.floor(
+              this.currentSlide / this.slidesToScroll
+            );
+            indicator.classList.toggle("active", index === activeSlide);
+          });
+        }
+      }
+
+      // Initialize slider when DOM is fully loaded
+      document.addEventListener("DOMContentLoaded", () => {
+        const sliderContainer = document.querySelector(
+          ".multi-card-slider-container"
+        );
+        new MultiCardSlider(sliderContainer, {
+          slidesToShow: 3,
+          slidesToScroll: 1,
+          responsive: [
+            { breakpoint: 1024, slidesToShow: 2 },
+            { breakpoint: 768, slidesToShow: 1 },
+          ],
+        });
+      });
+    </script>
+  </body>
+</html>
