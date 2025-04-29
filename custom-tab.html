@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HSBC Design Thinking Methodology</title>
+    <style>
+      :root {
+        --primary-color: #db0011;
+        --secondary-color: #333;
+        --bg-color: #f5f5f5;
+        --text-color: #333;
+        --tab-inactive: #e0e0e0;
+        --tab-active: #fff;
+        --border-radius: 4px;
+        --transition-speed: 0.3s;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        line-height: 1.6;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background-color: #fff;
+        border-radius: var(--border-radius);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .header {
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .header h1 {
+        color: var(--secondary-color);
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+        padding-left: 10px;
+        border-left: 4px solid var(--primary-color);
+      }
+
+      .header p {
+        color: #666;
+        margin-bottom: 20px;
+      }
+
+      .tabs-container {
+        width: 100%;
+        overflow: hidden;
+      }
+
+      .tabs {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        background-color: #fafafa;
+        border-bottom: 1px solid #eee;
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: none; /* Firefox */
+      }
+
+      .tabs::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Edge */
+      }
+
+      .tab-item {
+        padding: 15px 25px;
+        background-color: var(--tab-inactive);
+        cursor: pointer;
+        transition: all var(--transition-speed) ease;
+        border-right: 1px solid #ddd;
+        position: relative;
+        font-weight: 500;
+        text-align: center;
+        min-width: 140px;
+      }
+
+      .tab-item::before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: var(--primary-color);
+        transform: scaleX(0);
+        transition: transform var(--transition-speed) ease;
+        transform-origin: bottom left;
+      }
+
+      .tab-item:hover {
+        background-color: #f0f0f0;
+      }
+
+      .tab-item.active {
+        background-color: var(--tab-active);
+        color: var(--primary-color);
+      }
+
+      .tab-item.active::before {
+        transform: scaleX(1);
+      }
+
+      .tab-item span {
+        display: block;
+        font-size: 0.9rem;
+      }
+
+      .tab-item span:first-child {
+        font-weight: bold;
+        margin-bottom: 3px;
+      }
+
+      .tab-content {
+        padding: 30px;
+        display: none;
+        animation: fadeIn 0.5s ease;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .tab-content h3 {
+        margin-bottom: 15px;
+        color: var(--secondary-color);
+      }
+
+      .tab-content p {
+        margin-bottom: 15px;
+        line-height: 1.7;
+      }
+
+      .tab-content ul {
+        margin-left: 20px;
+        margin-bottom: 15px;
+      }
+
+      .tab-content li {
+        margin-bottom: 8px;
+      }
+
+      .icon-container {
+        text-align: right;
+        margin-top: 20px;
+      }
+
+      .icon {
+        width: 100px;
+        height: auto;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .action-btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: var(--primary-color);
+        color: white;
+        text-decoration: none;
+        border-radius: var(--border-radius);
+        font-weight: bold;
+        margin-top: 15px;
+        transition: all var(--transition-speed) ease;
+      }
+
+      .action-btn:hover {
+        background-color: #b5000e;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      @media (max-width: 768px) {
+        .tabs {
+          flex-wrap: nowrap;
+          overflow-x: auto;
+        }
+
+        .tab-item {
+          padding: 12px 15px;
+          min-width: 120px;
+          font-size: 0.9rem;
+        }
+
+        .tab-content {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Incorporate the HSBC's Design Thinking methodology</h1>
+        <p>
+          Get an overview and follow the process' phases that are aligned with
+          the Design Thinking methodology. The Design Thinking process is a
+          repeatable approach which gives 'creative confidence' and the right to
+          experiment, test and prototype. It's also an end-to-end action guide
+          that outlines the methods to use and outcomes at each stage.
+        </p>
+      </div>
+
+      <div class="tabs-container">
+        <ul class="tabs">
+          <li class="tab-item active" data-tab="tab1">Mobilise</li>
+          <li class="tab-item" data-tab="tab2">Empathise</li>
+          <li class="tab-item" data-tab="tab3">Define</li>
+          <li class="tab-item" data-tab="tab4">Ideate</li>
+          <li class="tab-item" data-tab="tab5">Prototype</li>
+          <li class="tab-item" data-tab="tab6">Implement</li>
+          <li class="tab-item" data-tab="tab7">Assess</li>
+          <li class="tab-item" data-tab="tab8">Optimise</li>
+        </ul>
+
+        <div id="tab1" class="tab-content active">
+          <h3>Mobilise</h3>
+          <p>
+            <strong>HSBC meaning:</strong> Design thinking process starts with
+            Mobilise, where we ensure our project has a clear unbiased problem
+            statement/opportunity area, scope and that team is set up for
+            success.
+          </p>
+
+          <h3>Cyber action</h3>
+          <p>Plan the design process</p>
+          <ul>
+            <li>
+              Include human-centered design as a mandatory step in the project
+              lifecycle.
+            </li>
+            <li>
+              Define UX/UI milestones, such as user research, prototype
+              evaluations, and usability testing.
+            </li>
+          </ul>
+
+          <div class="icon-container">
+            <svg
+              class="icon"
+              viewBox="0 0 200 120"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M160 40 C160 17.91 142.09 0 120 0 C97.91 0 80 17.91 80 40 C80 62.09 97.91 80 120 80 L120 80 L120 80 Z"
+                fill="none"
+                stroke="#000"
+                stroke-width="2"
+              />
+              <path
+                d="M120 25 L120 45 M120 45 L130 55"
+                stroke="#000"
+                stroke-width="2"
+              />
+              <circle cx="120" cy="25" r="5" fill="#db0011" />
+              <circle cx="120" cy="45" r="5" fill="#db0011" />
+              <circle cx="130" cy="55" r="5" fill="#db0011" />
+            </svg>
+          </div>
+
+          <a href="#" class="action-btn">See what we do</a>
+        </div>
+
+        <div id="tab2" class="tab-content">
+          <h3>Empathise</h3>
+          <p>
+            The Empathise phase focuses on understanding users through research
+            and observation. This helps gather insights about their needs,
+            challenges, and behaviors.
+          </p>
+
+          <h3>Actions</h3>
+          <ul>
+            <li>Conduct user interviews and observations</li>
+            <li>Create user personas based on research</li>
+            <li>Document user journeys and pain points</li>
+            <li>
+              Gather qualitative and quantitative data about user experiences
+            </li>
+          </ul>
+
+          <div class="icon-container">
+            <svg
+              class="icon"
+              viewBox="0 0 200 120"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M130 40 C130 29 121 20 110 20 C99 20 90 29 90 40 C90 51 99 60 110 60 C121 60 130 51 130 40 Z"
+                fill="none"
+                stroke="#000"
+                stroke-width="2"
+              />
+              <path
+                d="M110 27 C105 27 100 30 100 40 C100 50 105 53 110 53 C115 53 120 50 120 40 C120 30 115 27 110 27 Z"
+                fill="#db0011"
+              />
+              <path
+                d="M100 38 L100 42 M120 38 L120 42"
+                stroke="#000"
+                stroke-width="3"
+              />
+            </svg>
+          </div>
+
+          <a href="#" class="action-btn">Explore tools</a>
+        </div>
+
+        <div id="tab3" class="tab-content">
+          <h3>Define</h3>
+          <p>
+            In the Define phase, we synthesize the information gathered during
+            the Empathise phase to clearly articulate the problem we're solving.
+          </p>
+
+          <h3>Key activities</h3>
+          <ul>
+            <li>Analyze research findings and identify patterns</li>
+            <li>Create clear problem statements</li>
+            <li>Define user needs and success metrics</li>
+            <li>Prioritize opportunities based on impact and feasibility</li>
+          </ul>
+
+          <div class="icon-container">
+            <svg
+              class="icon"
+              viewBox="0 0 200 120"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                x="70"
+                y="20"
+                width="80"
+                height="60"
+                rx="5"
+                ry="5"
+                fill="none"
+                stroke="#000"
+                stroke-width="2"
+              />
+              <line
+                x1="80"
+                y1="40"
+                x2="140"
+                y2="40"
+                stroke="#000"
+                stroke-width="2"
+              />
+              <line
+                x1="80"
+                y1="50"
+                x2="140"
+                y2="50"
+                stroke="#000"
+                stroke-width="2"
+              />
+              <line
+                x1="80"
+                y1="60"
+                x2="120"
+                y2="60"
+                stroke="#000"
+                stroke-width="2"
+              />
+              <circle cx="100" cy="30" r="5" fill="#db0011" />
+            </svg>
+          </div>
+
+          <a href="#" class="action-btn">See methods</a>
+        </div>
+
+        <div id="tab4" class="tab-content">
+          <h3>Ideate</h3>
+          <p>
+            The Ideate phase involves generating a wide range of creative
+            solutions to the defined problem statement.
+          </p>
+
+          <h3>Techniques</h3>
+          <ul>
+            <li>Brainstorming sessions with diverse team members</li>
+            <li>Sketching and visualizing concepts</li>
+            <li>Exploring alternative approaches</li>
+            <li>
+              Evaluating ideas against user needs and business constraints
+            </li>
+          </ul>
+
+          <div class="icon-container">
+            <svg
+              class="icon"
+              viewBox="0 0 200 120"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M100 20 L120 20 L120 40 L140 40 L140 60 L120 60 L120 80 L100 80 L100 60 L80 60 L80 40 L100 40 Z"
+                fill="none"
+                stroke="#000"
+                stroke-width="2"
+              />
+              <circle cx="110" cy="50" r="10" fill="#db0011" />
+            </svg>
+          </div>
+
+          <a href="#" class="action-btn">Ideation tools</a>
+        </div>
+
+        <div id="tab5" class="tab-content">
+          <h3>Prototype</h3>
+          <p>
+            In the Prototype phase, we create scaled-down versions of the
+            product to investigate the solutions generated during ideation.
+          </p>
+
+          <h3>Approach</h3>
+          <ul>
+            <li>Build rough prototypes to test key concepts</li>
+            <li>Create wireframes and interactive mockups</li>
+            <li>Focus on core functionality rather than visual design</li>
+            <li>Prepare for user testing sessions</li>
+          </ul>
+
+          <div class="icon-container">
+            <svg
+              class="icon"
+              viewBox="0 0 200 120"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                x="70"
+                y="30"
+                width="60"
+                height="40"
+                rx="2"
+                ry="2"
+                fill="none"
+                stroke="#000"
+                stroke-width="2"
+              />
+              <rect
+                x="80"
+                y="40"
+                width="40"
+                height="20"
+                fill="#f0f0f0"
+                stroke="#000"
+                stroke-width="1"
+              />
+              <circle
+                cx="150"
+                cy="50"
+                r="15"
+                fill="none"
+                stroke="#000"
+                stroke-width="2"
+              />
+              <path
+                d="M150 35 L150 50 L160 50"
+                stroke="#db0011"
+                stroke-width="2"
+              />
+            </svg>
+          </div>
+
+          <a href="#" class="action-btn">Prototyping guide</a>
+        </div>
+
+        <div id="tab6" class="tab-content">
+          <h3>Implement</h3>
+          <p>
+            The Implement phase involves bringing your solution to life and
+            preparing it for launch.
+          </p>
+
+          <h3>Key stages</h3>
+          <ul>
+            <li>Create detailed specifications and requirements</li>
+            <li>Develop the solution with regular quality assurance</li>
+            <li>Conduct final user testing before launch</li>
+            <li>Prepare documentation and training materials</li>
+          </ul>
+
+          <div class="icon-container">
+            <svg
+              class="icon"
+              viewBox="0 0 200 120"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M70 30 L150 30 L150 70 L70 70 Z"
+                fill="none"
+                stroke="#000"
+                stroke-width="2"
+              />
+              <path
+                d="M100 30 L100 70"
+                stroke="#000"
+                stroke-width="2"
+                stroke-dasharray="5,5"
+              />
+              <path
+                d="M70 50 L150 50"
+                stroke="#000"
+                stroke-width="2"
+                stroke-dasharray="5,5"
+              />
+              <circle cx="100" cy="50" r="10" fill="#db0011" />
+            </svg>
+          </div>
+
+          <a href="#" class="action-btn">Implementation checklist</a>
+        </div>
+
+        <div id="tab7" class="tab-content">
+          <h3>Assess</h3>
+          <p>
+            The Assess phase involves measuring the effectiveness of your
+            solution against the initial goals and user needs.
+          </p>
+
+          <h3>Evaluation methods</h3>
+          <ul>
+            <li>Collect user feedback through surveys and interviews</li>
+            <li>Analyze usage metrics and performance data</li>
+            <li>Compare results with initial success criteria</li>
+            <li>Document lessons learned and areas for improvement</li>
+          </ul>
+
+          <div class="icon-container">
+            <svg
+              class="icon"
+              viewBox="0 0 200 120"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M70 70 L70 30 L150 30 L150 70 Z"
+                fill="none"
+                stroke="#000"
+                stroke-width="2"
+              />
+              <path
+                d="M80 60 L100 40 L120 50 L140 35"
+                stroke="#db0011"
+                stroke-width="3"
+                fill="none"
+              />
+              <circle cx="100" cy="40" r="3" fill="#000" />
+              <circle cx="120" cy="50" r="3" fill="#000" />
+              <circle cx="140" cy="35" r="3" fill="#000" />
+            </svg>
+          </div>
+
+          <a href="#" class="action-btn">Assessment framework</a>
+        </div>
+
+        <div id="tab8" class="tab-content">
+          <h3>Optimise</h3>
+          <p>
+            The Optimise phase focuses on continuous improvement based on
+            assessment results and evolving user needs.
+          </p>
+
+          <h3>Improvement strategies</h3>
+          <ul>
+            <li>Prioritize enhancements based on user impact</li>
+            <li>Implement incremental updates</li>
+            <li>Refine the user experience based on feedback</li>
+            <li>Consider scalability and future needs</li>
+          </ul>
+
+          <div class="icon-container">
+            <svg
+              class="icon"
+              viewBox="0 0 200 120"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M110 20 C140 20 160 50 130 70 C150 100 110 110 90 80 C60 100 40 70 60 50 C40 20 80 10 110 20 Z"
+                fill="none"
+                stroke="#000"
+                stroke-width="2"
+              />
+              <path
+                d="M100 40 L100 60 M90 50 L110 50"
+                stroke="#db0011"
+                stroke-width="3"
+              />
+            </svg>
+          </div>
+
+          <a href="#" class="action-btn">Optimisation techniques</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const tabItems = document.querySelectorAll(".tab-item");
+        const tabContents = document.querySelectorAll(".tab-content");
+
+        tabItems.forEach((item) => {
+          item.addEventListener("click", function () {
+            // Add click animation
+            this.style.animation = "pulse 0.5s";
+            setTimeout(() => {
+              this.style.animation = "";
+            }, 500);
+
+            // Get the data-tab attribute value
+            const tabId = this.getAttribute("data-tab");
+
+            // Remove active class from all tabs and contents
+            tabItems.forEach((tab) => tab.classList.remove("active"));
+            tabContents.forEach((content) =>
+              content.classList.remove("active")
+            );
+
+            // Add active class to clicked tab and corresponding content
+            this.classList.add("active");
+            document.getElementById(tabId).classList.add("active");
+
+            // Scroll the tab into view if needed
+            const tabsContainer = document.querySelector(".tabs");
+            const tabRect = this.getBoundingClientRect();
+            const containerRect = tabsContainer.getBoundingClientRect();
+
+            if (tabRect.right > containerRect.right) {
+              tabsContainer.scrollLeft +=
+                tabRect.right - containerRect.right + 20;
+            } else if (tabRect.left < containerRect.left) {
+              tabsContainer.scrollLeft -=
+                containerRect.left - tabRect.left + 20;
+            }
+          });
+        });
+
+        // Add hover effect to action buttons
+        const actionBtns = document.querySelectorAll(".action-btn");
+        actionBtns.forEach((btn) => {
+          btn.addEventListener("mouseenter", function () {
+            this.style.transition = "all 0.3s ease";
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

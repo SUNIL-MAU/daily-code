@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smooth Carousel</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #f0f0f0;
+      }
+
+      .carousel-container {
+        position: relative;
+        width: 600px;
+        height: 400px;
+        overflow: hidden;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: #fff;
+      }
+
+      .carousel {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.5s ease-in-out; /* Smooth transition for sliding */
+      }
+
+      .carousel-slide {
+        min-width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+      }
+
+      .carousel-slide img {
+        width: 50%;
+        height: auto;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+
+      .carousel-content {
+        width: 45%;
+        padding: 20px;
+      }
+
+      .carousel-content h2 {
+        font-size: 24px;
+        margin-bottom: 10px;
+        color: #333;
+      }
+
+      .carousel-content p {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 10px;
+      }
+
+      .carousel-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        font-size: 24px;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s;
+      }
+
+      .carousel-btn:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+      }
+
+      .prev {
+        left: 10px;
+      }
+
+      .next {
+        right: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="carousel-container">
+      <div class="carousel">
+        <div class="carousel-slide">
+          <img
+            src="https://via.placeholder.com/600x300?text=Slide+1"
+            alt="Slide 1"
+          />
+          <div class="carousel-content">
+            <h2>Check the subject</h2>
+            <p>
+              Look out for the EXTERNAL warning. It informs you that the email
+              is from an external source and should be treated with caution.
+            </p>
+            <p>Ensure the subject matches the email content.</p>
+          </div>
+        </div>
+        <div class="carousel-slide">
+          <img
+            src="https://via.placeholder.com/600x300?text=Slide+2"
+            alt="Slide 2"
+          />
+          <div class="carousel-content">
+            <h2>Verify the sender</h2>
+            <p>
+              Always check the sender's email address. Be cautious if it looks
+              unfamiliar or suspicious.
+            </p>
+            <p>Hover over the sender's name to see the full email address.</p>
+          </div>
+        </div>
+        <div class="carousel-slide">
+          <img
+            src="https://via.placeholder.com/600x300?text=Slide+3"
+            alt="Slide 3"
+          />
+          <div class="carousel-content">
+            <h2>Avoid clicking links</h2>
+            <p>
+              Do not click on links in emails unless you are certain of their
+              legitimacy.
+            </p>
+            <p>Hover over links to see the URL before clicking.</p>
+          </div>
+        </div>
+      </div>
+      <button class="carousel-btn prev">&lt;</button>
+      <button class="carousel-btn next">&gt;</button>
+    </div>
+    <script>
+      const carousel = document.querySelector(".carousel");
+      const slides = document.querySelectorAll(".carousel-slide");
+      const prevBtn = document.querySelector(".prev");
+      const nextBtn = document.querySelector(".next");
+
+      let currentIndex = 0;
+      const totalSlides = slides.length;
+
+      function updateCarousel() {
+        carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+      }
+
+      nextBtn.addEventListener("click", () => {
+        currentIndex = (currentIndex + 1) % totalSlides; // Loop back to first slide
+        updateCarousel();
+      });
+
+      prevBtn.addEventListener("click", () => {
+        currentIndex = (currentIndex - 1 + totalSlides) % totalSlides; // Loop to last slide
+        updateCarousel();
+      });
+
+      // Optional: Auto-slide every 5 seconds
+      setInterval(() => {
+        currentIndex = (currentIndex + 1) % totalSlides;
+        updateCarousel();
+      }, 5000);
+    </script>
+  </body>
+</html>
