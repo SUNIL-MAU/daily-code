@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Automatic Card Slider</title>
+    <style>
+      .auto-slider * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      .auto-slider {
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .auto-slider__container {
+        max-width: 800px;
+        width: 100%;
+        position: relative;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .auto-slider__wrapper {
+        overflow: hidden;
+        border-radius: 15px;
+        position: relative;
+        height: 400px;
+      }
+
+      .auto-slider__track {
+        display: flex;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+      }
+
+      .auto-slider__slide {
+        min-width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        border-radius: 15px;
+        overflow: hidden;
+      }
+
+      .auto-slider__content {
+        text-align: center;
+        padding: 40px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        max-width: 80%;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        transform: translateY(0);
+        transition: transform 0.3s ease;
+      }
+
+      .auto-slider__slide:nth-child(1) {
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      }
+      .auto-slider__slide:nth-child(2) {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      }
+      .auto-slider__slide:nth-child(3) {
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      }
+      .auto-slider__slide:nth-child(4) {
+        background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%);
+      }
+
+      .auto-slider__content:hover {
+        transform: translateY(-5px);
+      }
+
+      .auto-slider__title {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        color: #333;
+        font-weight: 700;
+      }
+
+      .auto-slider__text {
+        font-size: 1.1rem;
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 20px;
+      }
+
+      .auto-slider__number {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.8);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+        color: #333;
+      }
+
+      .auto-slider__progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        border-radius: 2px;
+        transition: width 0.1s linear;
+      }
+
+      @keyframes autoSliderSlideIn {
+        from {
+          opacity: 0;
+          transform: translateX(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .auto-slider__content {
+        animation: autoSliderSlideIn 0.6s ease forwards;
+      }
+
+      @media (max-width: 768px) {
+        .auto-slider__title {
+          font-size: 2rem;
+        }
+
+        .auto-slider__text {
+          font-size: 1rem;
+        }
+
+        .auto-slider__content {
+          padding: 30px 20px;
+          max-width: 90%;
+        }
+
+        .auto-slider__wrapper {
+          height: 350px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auto-slider">
+      <div class="auto-slider__container">
+        <div class="auto-slider__wrapper">
+          <div class="auto-slider__track" id="autoSliderTrack">
+            <div class="auto-slider__slide">
+              <div class="auto-slider__number">1</div>
+              <div class="auto-slider__content">
+                <h2 class="auto-slider__title">Welcome</h2>
+                <p class="auto-slider__text">
+                  Experience the power of modern web design with smooth
+                  animations and beautiful transitions that captivate your
+                  audience.
+                </p>
+              </div>
+            </div>
+            <div class="auto-slider__slide">
+              <div class="auto-slider__number">2</div>
+              <div class="auto-slider__content">
+                <h2 class="auto-slider__title">Innovation</h2>
+                <p class="auto-slider__text">
+                  Discover cutting-edge solutions that push the boundaries of
+                  what's possible in digital experiences and user interaction.
+                </p>
+              </div>
+            </div>
+            <div class="auto-slider__slide">
+              <div class="auto-slider__number">3</div>
+              <div class="auto-slider__content">
+                <h2 class="auto-slider__title">Excellence</h2>
+                <p class="auto-slider__text">
+                  Delivering outstanding quality and performance that exceeds
+                  expectations and creates lasting impressions for users.
+                </p>
+              </div>
+            </div>
+            <div class="auto-slider__slide">
+              <div class="auto-slider__number">4</div>
+              <div class="auto-slider__content">
+                <h2 class="auto-slider__title">Future</h2>
+                <p class="auto-slider__text">
+                  Building tomorrow's digital landscape today with
+                  forward-thinking design and innovative technology solutions.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="auto-slider__progress" id="autoSliderProgress"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      class AutoCardSlider {
+        constructor(trackId, progressId) {
+          this.sliderTrack = document.getElementById(trackId);
+          this.progressBar = document.getElementById(progressId);
+          this.currentSlideIndex = 0;
+          this.totalSlidesCount = 4;
+          this.autoSlideDelay = 2000;
+          this.progressUpdateInterval = null;
+          this.autoSlideTimer = null;
+
+          this.initialize();
+        }
+
+        initialize() {
+          this.startAutoSliding();
+          this.startProgressBarAnimation();
+
+          // Pause on hover functionality
+          this.sliderTrack.addEventListener("mouseenter", () =>
+            this.pauseAutoSliding()
+          );
+          this.sliderTrack.addEventListener("mouseleave", () =>
+            this.resumeAutoSliding()
+          );
+
+          // Setup infinite loop
+          this.setupInfiniteScrolling();
+        }
+
+        setupInfiniteScrolling() {
+          // Clone the first slide and append it to the end
+          const firstSlideClone = this.sliderTrack.children[0].cloneNode(true);
+          this.sliderTrack.appendChild(firstSlideClone);
+        }
+
+        moveToSlide(slideIndex, instantTransition = false) {
+          const translateDistance = -slideIndex * 100;
+
+          if (instantTransition) {
+            this.sliderTrack.style.transition = "none";
+            this.sliderTrack.style.transform = `translateX(${translateDistance}%)`;
+            // Re-enable transition after a frame
+            requestAnimationFrame(() => {
+              this.sliderTrack.style.transition =
+                "transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)";
+            });
+          } else {
+            this.sliderTrack.style.transform = `translateX(${translateDistance}%)`;
+          }
+        }
+
+        advanceToNextSlide() {
+          this.currentSlideIndex++;
+
+          if (this.currentSlideIndex === this.totalSlidesCount) {
+            // Move to the cloned first slide
+            this.moveToSlide(this.currentSlideIndex);
+
+            // After transition completes, instantly jump back to real first slide
+            setTimeout(() => {
+              this.currentSlideIndex = 0;
+              this.moveToSlide(0, true);
+            }, 600); // Match the CSS transition duration
+          } else {
+            this.moveToSlide(this.currentSlideIndex);
+          }
+        }
+
+        startAutoSliding() {
+          this.autoSlideTimer = setInterval(() => {
+            this.advanceToNextSlide();
+          }, this.autoSlideDelay);
+        }
+
+        pauseAutoSliding() {
+          clearInterval(this.autoSlideTimer);
+          clearInterval(this.progressUpdateInterval);
+        }
+
+        resumeAutoSliding() {
+          this.startAutoSliding();
+          this.startProgressBarAnimation();
+        }
+
+        startProgressBarAnimation() {
+          let progressValue = 0;
+          const progressIncrement = 100 / (this.autoSlideDelay / 50);
+
+          this.progressUpdateInterval = setInterval(() => {
+            progressValue += progressIncrement;
+            this.progressBar.style.width = `${Math.min(progressValue, 100)}%`;
+
+            if (progressValue >= 100) {
+              progressValue = 0;
+            }
+          }, 50);
+        }
+      }
+
+      // Initialize the slider when the page loads
+      document.addEventListener("DOMContentLoaded", () => {
+        new AutoCardSlider("autoSliderTrack", "autoSliderProgress");
+      });
+    </script>
+  </body>
+</html>
