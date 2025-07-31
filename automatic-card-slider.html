@@ -227,16 +227,17 @@
         }
 
         initialize() {
+          var self = this;
           this.startAutoSliding();
           this.startProgressBarAnimation();
 
           // Pause on hover functionality
-          this.sliderTrack.addEventListener("mouseenter", () =>
-            this.pauseAutoSliding()
-          );
-          this.sliderTrack.addEventListener("mouseleave", () =>
-            this.resumeAutoSliding()
-          );
+          this.sliderTrack.addEventListener("mouseenter", function () {
+            self.pauseAutoSliding();
+          });
+          this.sliderTrack.addEventListener("mouseleave", function () {
+            self.resumeAutoSliding();
+          });
 
           // Setup infinite loop
           this.setupInfiniteScrolling();
@@ -248,23 +249,30 @@
           this.sliderTrack.appendChild(firstSlideClone);
         }
 
-        moveToSlide(slideIndex, instantTransition = false) {
-          const translateDistance = -slideIndex * 100;
+        moveToSlide(slideIndex, instantTransition) {
+          if (instantTransition === undefined) {
+            instantTransition = false;
+          }
+
+          var translateDistance = -slideIndex * 100;
+          var transformValue = "translateX(" + translateDistance + "%)";
 
           if (instantTransition) {
             this.sliderTrack.style.transition = "none";
-            this.sliderTrack.style.transform = `translateX(${translateDistance}%)`;
+            this.sliderTrack.style.transform = transformValue;
             // Re-enable transition after a frame
-            requestAnimationFrame(() => {
-              this.sliderTrack.style.transition =
+            var self = this;
+            requestAnimationFrame(function () {
+              self.sliderTrack.style.transition =
                 "transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)";
             });
           } else {
-            this.sliderTrack.style.transform = `translateX(${translateDistance}%)`;
+            this.sliderTrack.style.transform = transformValue;
           }
         }
 
         advanceToNextSlide() {
+          var self = this;
           this.currentSlideIndex++;
 
           if (this.currentSlideIndex === this.totalSlidesCount) {
@@ -272,9 +280,9 @@
             this.moveToSlide(this.currentSlideIndex);
 
             // After transition completes, instantly jump back to real first slide
-            setTimeout(() => {
-              this.currentSlideIndex = 0;
-              this.moveToSlide(0, true);
+            setTimeout(function () {
+              self.currentSlideIndex = 0;
+              self.moveToSlide(0, true);
             }, 600); // Match the CSS transition duration
           } else {
             this.moveToSlide(this.currentSlideIndex);
@@ -282,8 +290,9 @@
         }
 
         startAutoSliding() {
-          this.autoSlideTimer = setInterval(() => {
-            this.advanceToNextSlide();
+          var self = this;
+          this.autoSlideTimer = setInterval(function () {
+            self.advanceToNextSlide();
           }, this.autoSlideDelay);
         }
 
@@ -298,12 +307,13 @@
         }
 
         startProgressBarAnimation() {
-          let progressValue = 0;
-          const progressIncrement = 100 / (this.autoSlideDelay / 50);
+          var self = this;
+          var progressValue = 0;
+          var progressIncrement = 100 / (this.autoSlideDelay / 50);
 
-          this.progressUpdateInterval = setInterval(() => {
+          this.progressUpdateInterval = setInterval(function () {
             progressValue += progressIncrement;
-            this.progressBar.style.width = `${Math.min(progressValue, 100)}%`;
+            self.progressBar.style.width = Math.min(progressValue, 100) + "%";
 
             if (progressValue >= 100) {
               progressValue = 0;
