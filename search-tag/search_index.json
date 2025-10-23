@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Home Page",
+    "url": "/index.html",
+    "tags": ["home", "main", "welcome", "landing"],
+    "description": "Main landing page of the website"
+  },
+  {
+    "title": "About Us",
+    "url": "/about.html",
+    "tags": ["about", "company", "team", "info"],
+    "description": "Learn about our company and team"
+  },
+  {
+    "title": "Services",
+    "url": "/services.html",
+    "tags": ["services", "products", "offerings"],
+    "description": "Our services and products"
+  },
+  {
+    "title": "Contact",
+    "url": "/contact.html",
+    "tags": ["contact", "support", "help", "email"],
+    "description": "Get in touch with us"
+  },
+  {
+    "title": "Blog",
+    "url": "/blog.html",
+    "tags": ["blog", "articles", "news", "updates"],
+    "description": "Latest news and articles"
+  },
+  {
+    "title": "FAQ",
+    "url": "/faq.html",
+    "tags": ["faq", "help", "questions", "support"],
+    "description": "Frequently asked questions"
+  },
+  {
+    "title": "Pricing",
+    "url": "/pricing.html",
+    "tags": ["pricing", "plans", "cost", "payment"],
+    "description": "View our pricing plans"
+  },
+  {
+    "title": "Documentation",
+    "url": "/docs.html",
+    "tags": ["docs", "documentation", "guide", "help"],
+    "description": "Technical documentation and guides"
+  }
+]

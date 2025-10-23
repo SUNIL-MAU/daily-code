@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Bar Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+    }
+
+    header {
+      background: #2c3e50;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .logo {
+      color: white;
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .search-container {
+      position: relative;
+      flex: 1;
+      max-width: 600px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      padding-right: 2.5rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #7f8c8d;
+      pointer-events: none;
+    }
+
+    .search-results {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      left: 0;
+      right: 0;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      max-height: 400px;
+      overflow-y: auto;
+      display: none;
+      z-index: 1000;
+    }
+
+    .search-results.show {
+      display: block;
+    }
+
+    .search-result-item {
+      padding: 1rem;
+      border-bottom: 1px solid #ecf0f1;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      text-decoration: none;
+      display: block;
+      color: inherit;
+    }
+
+    .search-result-item:hover {
+      background: #f8f9fa;
+    }
+
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+
+    .result-title {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 0.25rem;
+      font-size: 1rem;
+    }
+
+    .result-description {
+      font-size: 0.875rem;
+      color: #7f8c8d;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      background: #3498db;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+    }
+
+    .tag.matched {
+      background: #e74c3c;
+      font-weight: 600;
+    }
+
+    .no-results {
+      padding: 2rem;
+      text-align: center;
+      color: #7f8c8d;
+    }
+
+    .loading {
+      padding: 2rem;
+      text-align: center;
+      color: #3498db;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    .demo-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .demo-content h1 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+
+    .demo-content p {
+      color: #7f8c8d;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .instructions {
+      background: #ecf0f1;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-top: 2rem;
+    }
+
+    .instructions h2 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+
+    .instructions ul {
+      margin-left: 1.5rem;
+      color: #7f8c8d;
+    }
+
+    .instructions li {
+      margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .search-container {
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a href="/" class="logo">MyWebsite</a>
+      <div class="search-container">
+        <input 
+          type="text" 
+          class="search-input" 
+          id="searchInput"
+          placeholder="Search pages by tags (e.g., home, services, blog)..."
+          autocomplete="off"
+        >
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="demo-content">
+      <h1>Tag-Based Search System</h1>
+      <p>This is a complete implementation of a tag-based search system for your 95-page website. The search bar allows users to find pages by typing tags or keywords.</p>
+      
+      <div class="instructions">
+        <h2>How to Use:</h2>
+        <ul>
+          <li>Try searching: <strong>"home"</strong>, <strong>"services"</strong>, <strong>"contact"</strong>, <strong>"blog"</strong></li>
+          <li>Search supports partial matches (e.g., "ser" will find "services")</li>
+          <li>Click on any result to navigate to that page</li>
+          <li>Press Escape to close the search results</li>
+        </ul>
+
+        <h2 style="margin-top: 1.5rem;">Implementation Steps:</h2>
+        <ul>
+          <li>Create <code>public/search-index.json</code> with your 95 pages</li>
+          <li>Copy the HTML/CSS/JS code into your header</li>
+          <li>Update the JSON file with your actual page URLs, titles, tags, and descriptions</li>
+          <li>Ensure Express.js serves the JSON file as a static asset</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let pagesData = [];
+    let searchTimeout = null;
+
+    // Fetch the search index when page loads
+    async function loadSearchIndex() {
+      try {
+        const response = await fetch('/search-index.json');
+        if (!response.ok) {
+          throw new Error('Failed to load search index');
+        }
+        pagesData = await response.json();
+      } catch (error) {
+        console.error('Error loading search index:', error);
+        // Fallback to demo data if JSON file doesn't exist
+        pagesData = [
+          {
+            title: "Home Page",
+            url: "/index.html",
+            tags: ["home", "main", "welcome", "landing"],
+            description: "Main landing page of the website"
+          },
+          {
+            title: "About Us",
+            url: "/about.html",
+            tags: ["about", "company", "team", "info"],
+            description: "Learn about our company and team"
+          },
+          {
+            title: "Services",
+            url: "/services.html",
+            tags: ["services", "products", "offerings"],
+            description: "Our services and products"
+          },
+          {
+            title: "Contact",
+            url: "/contact.html",
+            tags: ["contact", "support", "help", "email"],
+            description: "Get in touch with us"
+          },
+          {
+            title: "Blog",
+            url: "/blog.html",
+            tags: ["blog", "articles", "news", "updates"],
+            description: "Latest news and articles"
+          },
+          {
+            title: "FAQ",
+            url: "/faq.html",
+            tags: ["faq", "help", "questions", "support"],
+            description: "Frequently asked questions"
+          },
+          {
+            title: "Pricing",
+            url: "/pricing.html",
+            tags: ["pricing", "plans", "cost", "payment"],
+            description: "View our pricing plans"
+          },
+          {
+            title: "Documentation",
+            url: "/docs.html",
+            tags: ["docs", "documentation", "guide", "help"],
+            description: "Technical documentation and guides"
+          }
+        ];
+      }
+    }
+
+    // Search function
+    function searchPages(query) {
+      if (!query || query.trim().length === 0) {
+        return [];
+      }
+
+      const searchTerm = query.toLowerCase().trim();
+      
+      return pagesData.filter(page => {
+        // Check if any tag contains the search term
+        const tagMatch = page.tags.some(tag => 
+          tag.toLowerCase().includes(searchTerm)
+        );
+        
+        // Also check title and description for broader search
+        const titleMatch = page.title.toLowerCase().includes(searchTerm);
+        const descMatch = page.description.toLowerCase().includes(searchTerm);
+        
+        return tagMatch || titleMatch || descMatch;
+      }).map(page => {
+        // Mark which tags matched
+        return {
+          ...page,
+          matchedTags: page.tags.filter(tag => 
+            tag.toLowerCase().includes(searchTerm)
+          )
+        };
+      });
+    }
+
+    // Display search results
+    function displayResults(results, query) {
+      const resultsContainer = document.getElementById('searchResults');
+      
+      if (results.length === 0) {
+        resultsContainer.innerHTML = `
+          <div class="no-results">
+            No pages found for "${query}". Try different tags.
+          </div>
+        `;
+        resultsContainer.classList.add('show');
+        return;
+      }
+
+      const resultsHTML = results.map(page => `
+        <a href="${page.url}" class="search-result-item">
+          <div class="result-title">${page.title}</div>
+          <div class="result-description">${page.description}</div>
+          <div class="result-tags">
+            ${page.tags.map(tag => `
+              <span class="tag ${page.matchedTags.includes(tag) ? 'matched' : ''}">${tag}</span>
+            `).join('')}
+          </div>
+        </a>
+      `).join('');
+
+      resultsContainer.innerHTML = resultsHTML;
+      resultsContainer.classList.add('show');
+    }
+
+    // Hide search results
+    function hideResults() {
+      const resultsContainer = document.getElementById('searchResults');
+      resultsContainer.classList.remove('show');
+    }
+
+    // Initialize search
+    function initSearch() {
+      const searchInput = document.getElementById('searchInput');
+      const resultsContainer = document.getElementById('searchResults');
+
+      // Search on input
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value;
+        
+        // Clear previous timeout
+        clearTimeout(searchTimeout);
+        
+        if (query.trim().length === 0) {
+          hideResults();
+          return;
+        }
+
+        // Debounce search
+        searchTimeout = setTimeout(() => {
+          const results = searchPages(query);
+          displayResults(results, query);
+        }, 300);
+      });
+
+      // Close results when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
+          hideResults();
+        }
+      });
+
+      // Close results on Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          hideResults();
+          searchInput.blur();
+        }
+      });
+
+      // Show results when input is focused and has value
+      searchInput.addEventListener('focus', () => {
+        if (searchInput.value.trim().length > 0) {
+          const results = searchPages(searchInput.value);
+          displayResults(results, searchInput.value);
+        }
+      });
+    }
+
+    // Load search index and initialize search when page loads
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadSearchIndex();
+      initSearch();
+    });
+  </script>
+</body>
+</html>
