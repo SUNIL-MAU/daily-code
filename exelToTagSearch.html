@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Excel → JS/JSON Exporter</title>
+    <style>
+      :root {
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+          Roboto, "Helvetica Neue", Arial;
+      }
+      body {
+        max-width: 980px;
+        margin: 28px auto;
+        padding: 20px;
+        border-radius: 12px;
+      }
+      .card {
+        border: 1px solid #e6e6e6;
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.03);
+      }
+      h1 {
+        margin: 0 0 10px;
+        font-size: 20px;
+      }
+      p.lead {
+        margin: 0 0 16px;
+        color: #444;
+      }
+
+      .row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      input[type="file"] {
+        padding: 8px;
+      }
+      button,
+      a.button {
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 0;
+        background: #0b74ff;
+        color: #fff;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+      }
+      a.button.secondary,
+      button.secondary {
+        background: #6b7280;
+      }
+      textarea {
+        width: 100%;
+        min-height: 200px;
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        font-family: monospace;
+        font-size: 13px;
+      }
+
+      .legend {
+        margin-top: 12px;
+        color: #666;
+        font-size: 13px;
+      }
+      footer {
+        margin-top: 18px;
+        color: #666;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Excel → JS/JSON Exporter</h1>
+      <p class="lead">
+        Upload the Excel file (first sheet used). It will convert rows into the
+        format you requested and let you preview + download a .json or .js file.
+      </p>
+
+      <div class="row">
+        <input id="file" type="file" accept=".xlsx,.xls,.csv" />
+        <button id="convert">Convert</button>
+        <a
+          id="downloadJson"
+          class="button secondary"
+          href="#"
+          download
+          style="pointer-events: none; opacity: 0.6"
+          >Download .json</a
+        >
+        <a
+          id="downloadJs"
+          class="button secondary"
+          href="#"
+          download
+          style="pointer-events: none; opacity: 0.6"
+          >Download .js</a
+        >
+      </div>
+
+      <div class="legend">
+        Expected column headers (case-sensitive): <strong>title</strong>,
+        <strong>url</strong>, <strong>tags</strong>. Tags should be separated by
+        semicolons (;).
+      </div>
+
+      <textarea
+        id="output"
+        placeholder="Converted output will appear here..."
+        readonly
+      ></textarea>
+
+      <footer>
+        By Alex — open this file in your browser (no server required). Works
+        offline using SheetJS (in-browser).
+      </footer>
+    </div>
+
+    <!-- SheetJS (xlsx) from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+      function jsStringSingleQuoted(s) {
+        if (s === undefined || s === null) return "''";
+        return (
+          "'" +
+          String(s)
+            .replace(/\\/g, "\\\\")
+            .replace(/'/g, "\\'")
+            .replace(/\n/g, "\\n") +
+          "'"
+        );
+      }
+
+      function buildCustomJsRepresentation(arr) {
+        const items = arr.map((o) => {
+          const tagsStr =
+            "[" +
+            o.tags.map((t) => jsStringSingleQuoted(t)).join(",\n\t\t\t") +
+            "]";
+          const pathStr = "`" + String(o.path).replace(/`/g, "\\`") + "`";
+          const titleStr = jsStringSingleQuoted(o.title);
+          return `{
+\tpath:${pathStr},\n\ttitle:${titleStr},\n\ttags:${tagsStr}\n}`;
+        });
+        return (
+          "[\n" +
+          items.map((it) => "\t" + it.replace(/\n/g, "\n\t")).join(",\n\n") +
+          "\n]"
+        );
+      }
+
+      function transformRows(rows) {
+        return rows
+          .map((r) => {
+            const tagsRaw = r.tags || r.Tags || "";
+            const tagsArr = String(tagsRaw)
+              .split(/;|,/)
+              .map((t) => t.trim())
+              .filter(Boolean);
+            return {
+              path: r.url || r.URL || r.Url || r.path || r.Path || "",
+              title: r.title || r.Title || "",
+              tags: tagsArr,
+            };
+          })
+          .filter(
+            (item) => item.path || item.title || (item.tags && item.tags.length)
+          );
+      }
+
+      document.getElementById("convert").addEventListener("click", () => {
+        const fileInput = document.getElementById("file");
+        const file = fileInput.files[0];
+        if (!file) {
+          alert("Please choose an Excel file first.");
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const data = new Uint8Array(e.target.result);
+          const wb = XLSX.read(data, { type: "array" });
+          const firstSheet = wb.SheetNames[0];
+          const sheet = wb.Sheets[firstSheet];
+          const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+          const transformed = transformRows(rows);
+          const jsonOutput = JSON.stringify(transformed, null, 2);
+          const jsFormatted = buildCustomJsRepresentation(transformed);
+
+          const outputEl = document.getElementById("output");
+          outputEl.value = jsFormatted;
+
+          // Create blobs and set anchor download links properly
+          const jsonBlob = new Blob([jsonOutput], { type: "application/json" });
+          const jsBlobContent = `const data = ${jsFormatted};\n\nexport default data;\n`;
+          const jsBlob = new Blob([jsBlobContent], {
+            type: "application/javascript",
+          });
+
+          const downloadJson = document.getElementById("downloadJson");
+          const downloadJs = document.getElementById("downloadJs");
+
+          const jsonUrl = URL.createObjectURL(jsonBlob);
+          const jsUrl = URL.createObjectURL(jsBlob);
+
+          downloadJson.href = jsonUrl;
+          downloadJson.download = "output.json";
+          downloadJson.style.pointerEvents = "auto";
+          downloadJson.style.opacity = "1";
+
+          downloadJs.href = jsUrl;
+          downloadJs.download = "output.js";
+          downloadJs.style.pointerEvents = "auto";
+          downloadJs.style.opacity = "1";
+
+          // Clean up old object URLs after some time
+          setTimeout(() => {
+            URL.revokeObjectURL(jsonUrl);
+            URL.revokeObjectURL(jsUrl);
+          }, 60000);
+        };
+
+        reader.readAsArrayBuffer(file);
+      });
+
+      document.body.addEventListener("dragover", (e) => {
+        e.preventDefault();
+      });
+      document.body.addEventListener("drop", (e) => {
+        e.preventDefault();
+        const f = e.dataTransfer.files[0];
+        if (f) document.getElementById("file").files = e.dataTransfer.files;
+      });
+    </script>
+  </body>
+</html>
